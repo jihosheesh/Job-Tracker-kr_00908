@@ -874,8 +874,9 @@ async function saveEdit(){
     job:document.getElementById('edit-job').value.trim(),
     job_detail:document.getElementById('edit-job-detail').value.trim(),
     memo:document.getElementById('edit-memo').value.trim(),
+    deadline:document.getElementById('edit-deadline').value||'',
   };
-  Object.assign(c,fields);closeModal();render();
+  Object.assign(c,fields);closeModal();render();renderCalendar();
   try{await sb.from('companies').update(fields).eq('id',id).eq('user_key',currentUser.key);}
   catch(e){alert('저장 오류: '+e.message);}
 }
