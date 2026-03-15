@@ -208,6 +208,38 @@ tr:hover td{background:rgba(255,255,255,.015);}
 .user-name{font-size:12px;font-weight:500;}
 .user-logout{font-size:11px;color:var(--text3);margin-left:4px;}
 
+
+/* CALENDAR */
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.cal-nav{display:flex;align-items:center;gap:12px;}
+.cal-nav-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);width:32px;height:32px;cursor:pointer;color:var(--text2);font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.cal-nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+.cal-month{font-size:17px;font-weight:700;min-width:120px;text-align:center;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-dow{text-align:center;font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;padding:6px 0;letter-spacing:.6px;}
+.cal-dow:first-child{color:var(--red);}
+.cal-dow:last-child{color:var(--accent);}
+.cal-cell{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);min-height:88px;padding:6px;position:relative;transition:border-color .15s;}
+.cal-cell:hover{border-color:var(--border2);}
+.cal-cell.today{border-color:var(--accent);background:rgba(79,127,255,.06);}
+.cal-cell.other-month{opacity:.35;}
+.cal-cell.has-event{border-color:var(--border2);}
+.cal-date{font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text2);}
+.cal-cell.today .cal-date{color:var(--accent);background:var(--accent);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;}
+.cal-event{font-size:10px;font-weight:500;padding:2px 5px;border-radius:3px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;line-height:1.4;}
+.cal-event.dream{background:rgba(167,139,250,.2);color:var(--purple);}
+.cal-event.target{background:rgba(79,127,255,.2);color:var(--accent);}
+.cal-event.safe{background:rgba(62,207,142,.2);color:var(--green);}
+.cal-event.passed{background:rgba(62,207,142,.15);color:var(--green);text-decoration:line-through;opacity:.7;}
+.cal-event.failed{background:rgba(240,96,96,.15);color:var(--red);text-decoration:line-through;opacity:.7;}
+.cal-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+.cal-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);}
+.cal-legend-dot{width:8px;height:8px;border-radius:2px;}
+.deadline-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:500;}
+.deadline-soon{background:rgba(245,166,35,.15);color:var(--amber);}
+.deadline-past{background:rgba(240,96,96,.15);color:var(--red);}
+.deadline-ok{background:rgba(62,207,142,.1);color:var(--green);}
+
 @media(max-width:768px){
   .stats-grid{grid-template-columns:repeat(3,1fr);}
   .board{grid-template-columns:1fr 1fr;}
@@ -254,6 +286,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <div id="user-badge-wrap" style="margin-right:12px"></div>
   <div class="tab-nav">
     <button class="tab-btn active" onclick="switchTab('tracker',this)">파이프라인</button>
+    <button class="tab-btn" onclick="switchTab('calendar',this)">채용달력</button>
     <button class="tab-btn" onclick="switchTab('board',this)">보드</button>
     <button class="tab-btn" onclick="switchTab('analysis',this)">자소서 분석</button>
     <button class="tab-btn" onclick="switchTab('settings',this)">설정</button>
@@ -283,6 +316,8 @@ tr:hover td{background:rgba(255,255,255,.015);}
     </select>
     <label>직무</label>
     <input class="inp" id="inp-job" placeholder="직무명" style="width:120px">
+    <label>마감일</label>
+    <input class="inp" id="inp-deadline" type="date" style="width:140px">
     <button class="btn" onclick="addCompany()">+ 추가</button>
   </div>
 
@@ -299,6 +334,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
           <th class="center" style="width:8%">2차면접</th>
           <th class="center" style="width:8%">최종합격</th>
           <th class="center" style="width:7%">탈락</th>
+          <th style="width:9%">마감일</th>
           <th>메모</th>
           <th style="width:6%"></th>
         </tr>
@@ -306,6 +342,26 @@ tr:hover td{background:rgba(255,255,255,.015);}
       <tbody id="tbody"></tbody>
     </table>
   </div>
+</div>
+
+
+<!-- ══ CALENDAR ══ -->
+<div class="section" id="tab-calendar">
+  <div class="cal-header">
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="calMove(-1)">‹</button>
+      <div class="cal-month" id="cal-month-label"></div>
+      <button class="cal-nav-btn" onclick="calMove(1)">›</button>
+    </div>
+    <button class="btn btn-muted" onclick="calToday()" style="font-size:12px;padding:5px 12px">오늘</button>
+  </div>
+  <div class="cal-legend">
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--purple)"></div>드림 기업</div>
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--accent)"></div>목표 기업</div>
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--green)"></div>안전 기업</div>
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--text3)"></div>마감일 기준 표시</div>
+  </div>
+  <div class="cal-grid" id="cal-grid"></div>
 </div>
 
 <!-- ══ BOARD ══ -->
@@ -464,6 +520,10 @@ tr:hover td{background:rgba(255,255,255,.015);}
       <input class="inp form-inp" id="edit-job" placeholder="예: 백엔드 개발자">
     </div>
     <div class="form-group">
+      <label class="form-label">마감일</label>
+      <input class="inp form-inp" id="edit-deadline" type="date">
+    </div>
+    <div class="form-group">
       <label class="form-label">직무 상세 / 담당 업무</label>
       <textarea class="inp form-textarea" id="edit-job-detail" rows="4"
         placeholder="담당하게 될 업무, 필요한 기술 스택, 팀 역할 등을 자유롭게 메모하세요.&#10;예: REST API 설계 및 개발, AWS 인프라 운영, 코드 리뷰 문화 중시"></textarea>
@@ -497,7 +557,7 @@ const STEP_COLORS = ["var(--teal)","var(--accent)","var(--purple)","var(--green)
 
 // ── STATE ─────────────────────────────────────────────
 const SEED = [
-  {name:"카카오",type:"dream",industry:"대기업",job:"백엔드 개발자",job_detail:"서버 설계, API 개발, 코드리뷰",steps:[true,false,false,false,false],memo:""},
+  {name:"카카오",type:"dream",industry:"대기업",job:"백엔드 개발자",job_detail:"서버 설계, API 개발, 코드리뷰",steps:[true,false,false,false,false],memo:"",deadline:""},
   {name:"네이버",type:"dream",industry:"대기업",job:"프론트엔드 개발",job_detail:"React 기반 UI 컴포넌트 개발",steps:[true,true,false,false,false],memo:"포트폴리오 추가 요청"},
   {name:"라인플러스",type:"target",industry:"외국기업",job:"풀스택 개발자",job_detail:"React + Node.js, 글로벌 서비스",steps:[true,true,true,false,false],memo:""},
   {name:"토스",type:"target",industry:"스타트업",job:"iOS 개발",job_detail:"Swift 기반 앱 개발",steps:[true,false,false,false,true],memo:"코딩테스트 탈락"},
@@ -512,10 +572,21 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function userKey(n,p){ return n.trim()+'_'+p.trim(); }
 function apiKeyStore(){ return 'jt_api_'+(currentUser?.key||'default'); }
 function stepsToDb(s){ return {step_doc:s[0],step_int1:s[1],step_int2:s[2],step_pass:s[3],step_fail:s[4]}; }
+function deadlineBadge(d){
+  if(!d) return '';
+  const today=new Date(); today.setHours(0,0,0,0);
+  const dl=new Date(d); dl.setHours(0,0,0,0);
+  const diff=Math.round((dl-today)/(1000*60*60*24));
+  if(diff<0) return `<span class='deadline-badge deadline-past'>D+${Math.abs(diff)}</span>`;
+  if(diff===0) return `<span class='deadline-badge deadline-soon'>D-Day</span>`;
+  if(diff<=7) return `<span class='deadline-badge deadline-soon'>D-${diff}</span>`;
+  return `<span class='deadline-badge deadline-ok'>D-${diff}</span>`;
+}
 function dbToSteps(r){ return [r.step_doc,r.step_int1,r.step_int2,r.step_pass,r.step_fail]; }
 function dbToCompany(r){
   return {id:r.id,name:r.name,type:r.type,industry:r.industry||'',
           job:r.job||'',job_detail:r.job_detail||'',memo:r.memo||'',
+          deadline:r.deadline||'',
           steps:dbToSteps(r),sort_order:r.sort_order||0};
 }
 function canActivate(c,idx){ const p=STEP_PREREQ[idx]; return p===null||c.steps[p]; }
@@ -603,6 +674,7 @@ function switchTab(tab,btn){
   document.getElementById('tab-'+tab).classList.add('active');
   btn.classList.add('active');
   if(tab==='board'){renderBoard();renderStatsDash();renderJobDash();renderGroupDash();}
+  if(tab==='calendar') renderCalendar();
   if(tab==='analysis') renderAnaSelect();
   if(tab==='settings') loadKeyStatus();
 }
@@ -647,6 +719,7 @@ function renderTable(){
         const tip=done?STEP_LABELS[i]+' 완료':(can?STEP_LABELS[i]:'이전 단계 완료 필요');
         return `<td style="text-align:center"><button class="${cls}" data-tip="${tip}" onclick="toggleStep(${c.id},${i})">${txt}</button></td>`;
       }).join('')}
+      <td style="text-align:center">${c.deadline?`<span style='font-size:11px;color:var(--text2)'>${c.deadline.slice(5).replace('-','/')}</span>${deadlineBadge(c.deadline)}`:'<span style="color:var(--text3);font-size:11px">—</span>'}</td>
       <td><input class="memo-inp" value="${esc(c.memo)}" placeholder="메모..." onchange="updateMemo(${c.id},this.value)"></td>
       <td>
         <button class="action-btn edit" onclick="openEdit(${c.id})" title="수정">✏</button>
@@ -656,6 +729,69 @@ function renderTable(){
 }
 
 function render(){ renderStats(); renderTable(); }
+
+// ── CALENDAR ──────────────────────────────────────────
+let calYear  = new Date().getFullYear();
+let calMonth = new Date().getMonth(); // 0-based
+
+function calToday(){ calYear=new Date().getFullYear(); calMonth=new Date().getMonth(); renderCalendar(); }
+function calMove(d){ calMonth+=d; if(calMonth>11){calMonth=0;calYear++;} if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
+
+function renderCalendar(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const label = `${calYear}년 ${calMonth+1}월`;
+  document.getElementById('cal-month-label').textContent = label;
+
+  // 이 달 마감일 있는 기업 모으기
+  const eventMap = {};
+  for(const c of companies){
+    if(!c.deadline) continue;
+    const d = new Date(c.deadline); d.setHours(0,0,0,0);
+    if(d.getFullYear()===calYear && d.getMonth()===calMonth){
+      const day = d.getDate();
+      if(!eventMap[day]) eventMap[day]=[];
+      eventMap[day].push(c);
+    }
+  }
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
+  const lastDate = new Date(calYear, calMonth+1, 0).getDate();
+  const prevLastDate = new Date(calYear, calMonth, 0).getDate();
+
+  const DOWS = ['일','월','화','수','목','금','토'];
+  let html = DOWS.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  // 이전달 날짜 채우기
+  for(let i=firstDay-1;i>=0;i--){
+    html += `<div class="cal-cell other-month"><div class="cal-date">${prevLastDate-i}</div></div>`;
+  }
+
+  // 이번달
+  for(let day=1;day<=lastDate;day++){
+    const thisDate = new Date(calYear,calMonth,day); thisDate.setHours(0,0,0,0);
+    const isToday = thisDate.getTime()===today.getTime();
+    const events = eventMap[day]||[];
+    const hasEvent = events.length>0;
+    let cls = 'cal-cell'+(isToday?' today':'')+(hasEvent?' has-event':'');
+    const dateHtml = isToday?`<div class="cal-date"><span style="background:var(--accent);color:#fff;width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">${day}</span></div>`
+                            :`<div class="cal-date" style="color:${(new Date(calYear,calMonth,day).getDay()===0)?'var(--red)':(new Date(calYear,calMonth,day).getDay()===6)?'var(--accent)':'var(--text2)'}">${day}</div>`;
+    const evHtml = events.slice(0,3).map(c=>{
+      const statusCls = c.steps[3]?'passed':c.steps[4]?'failed':c.type;
+      return `<div class="cal-event ${statusCls}" title="${c.name} — ${c.job||'직무미입력'}">${c.name}</div>`;
+    }).join('') + (events.length>3?`<div style="font-size:9px;color:var(--text3)">+${events.length-3}개</div>`:'');
+    html += `<div class="${cls}">${dateHtml}${evHtml}</div>`;
+  }
+
+  // 다음달 채우기
+  const totalCells = firstDay + lastDate;
+  const remaining = totalCells%7===0?0:7-(totalCells%7);
+  for(let i=1;i<=remaining;i++){
+    html += `<div class="cal-cell other-month"><div class="cal-date">${i}</div></div>`;
+  }
+
+  document.getElementById('cal-grid').innerHTML = html;
+}
+
 
 // ── CRUD ──────────────────────────────────────────────
 async function addCompany(){
@@ -668,13 +804,15 @@ async function addCompany(){
       type:document.getElementById('inp-type').value,
       industry:document.getElementById('inp-industry').value,
       job:document.getElementById('inp-job').value.trim(),
-      job_detail:'',memo:'',sort_order:companies.length,
+      job_detail:'',memo:'',deadline:document.getElementById('inp-deadline').value||'',
+      sort_order:companies.length,
       ...stepsToDb([false,false,false,false,false])
     }).select().single();
     if(error) throw error;
     companies.push(dbToCompany(data));
     document.getElementById('inp-name').value='';
     document.getElementById('inp-job').value='';
+    document.getElementById('inp-deadline').value='';
     render();
   }catch(e){alert('추가 오류: '+e.message);}
   clearLoading();
@@ -720,6 +858,7 @@ function openEdit(id){
   document.getElementById('edit-type').value=c.type;
   document.getElementById('edit-industry').value=c.industry||'';
   document.getElementById('edit-job').value=c.job||'';
+  document.getElementById('edit-deadline').value=c.deadline||'';
   document.getElementById('edit-job-detail').value=c.job_detail||'';
   document.getElementById('edit-memo').value=c.memo||'';
   document.getElementById('modal-overlay').classList.add('open');
@@ -1104,7 +1243,7 @@ async function importData(inp){
       await sb.from('companies').delete().eq('user_key',currentUser.key);
       const rows=d.map((c,i)=>({user_key:currentUser.key,name:c.name,type:c.type||'target',
         industry:c.industry||'',job:c.job||'',job_detail:c.job_detail||'',
-        memo:c.memo||'',sort_order:i,...stepsToDb(c.steps||[false,false,false,false,false])}));
+        memo:c.memo||'',deadline:c.deadline||'',sort_order:i,...stepsToDb(c.steps||[false,false,false,false,false])}));
       if(rows.length) await sb.from('companies').insert(rows);
       await fetchCompanies();clearLoading();render();alert('가져오기 완료!');
     }catch(ex){clearLoading();alert('오류: '+ex.message);}
