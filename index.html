@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>취업 파이프라인 트래커</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0d0f12; --bg2:#13161b; --bg3:#1a1e25; --bg4:#21262f;
+  --border:#2a2f3a; --border2:#343b47;
+  --text:#e8eaf0; --text2:#8a91a0; --text3:#555d6e;
+  --accent:#4f7fff; --accent2:#3d63cc;
+  --green:#3ecf8e; --green-bg:#0d2e1e;
+  --red:#f06060; --red-bg:#2e0d0d;
+  --amber:#f5a623; --amber-bg:#2e1f05;
+  --purple:#a78bfa; --purple-bg:#1a1035;
+  --teal:#34d8b4; --teal-bg:#062820;
+  --r:10px; --rs:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
+
+/* HEADER */
+.header{border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;background:rgba(13,15,18,.94);backdrop-filter:blur(14px);}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;}
+.logo-dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);}
+.tab-nav{display:flex;gap:2px;background:var(--bg3);border-radius:var(--rs);padding:3px;}
+.tab-btn{padding:6px 16px;font-size:13px;font-weight:500;border:none;border-radius:4px;cursor:pointer;transition:all .2s;background:transparent;color:var(--text2);font-family:'Noto Sans KR',sans-serif;}
+.tab-btn.active{background:var(--bg4);color:var(--text);}
+
+/* MAIN */
+.main{max-width:1200px;margin:0 auto;padding:28px 20px;}
+.section{display:none;}.section.active{display:block;}
+.section-title{font-size:19px;font-weight:700;margin-bottom:5px;letter-spacing:-.3px;}
+.section-desc{font-size:13px;color:var(--text2);margin-bottom:22px;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:22px;}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;}
+.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;}
+.stat-val{font-size:24px;font-weight:700;font-family:'DM Mono',monospace;}
+
+/* ADD BAR */
+.add-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.add-bar label{font-size:11px;color:var(--text3);white-space:nowrap;}
+.inp{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:7px 11px;color:var(--text);font-size:13px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color .2s;}
+.inp:focus{border-color:var(--accent);}
+.sel{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:7px 10px;color:var(--text);font-size:13px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;outline:none;}
+.btn{padding:7px 16px;border-radius:var(--rs);border:1px solid var(--accent2);background:rgba(79,127,255,.12);color:var(--accent);font-size:13px;font-weight:500;font-family:'Noto Sans KR',sans-serif;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.btn:hover{background:rgba(79,127,255,.22);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn-danger{border-color:rgba(240,96,96,.4);background:var(--red-bg);color:var(--red);}
+.btn-muted{border-color:var(--border2);background:var(--bg4);color:var(--text2);}
+
+/* TABLE */
+.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:auto;}
+table{width:100%;border-collapse:collapse;min-width:900px;}
+thead{background:var(--bg3);}
+th{padding:10px 12px;text-align:left;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--border);white-space:nowrap;}
+th.center{text-align:center;}
+td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.015);}
+
+/* STEP BUTTONS */
+.step-btn{width:36px;height:32px;border-radius:6px;border:1.5px solid var(--border2);background:var(--bg4);cursor:pointer;font-size:13px;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;}
+.step-btn:hover:not(.locked):not(.done){border-color:var(--text2);}
+.step-btn.done-0{border-color:var(--teal);background:var(--teal-bg);color:var(--teal);}
+.step-btn.done-1{border-color:var(--accent);background:rgba(79,127,255,.12);color:var(--accent);}
+.step-btn.done-2{border-color:var(--purple);background:var(--purple-bg);color:var(--purple);}
+.step-btn.done-3{border-color:var(--green);background:var(--green-bg);color:var(--green);}
+.step-btn.done-4{border-color:var(--red);background:var(--red-bg);color:var(--red);}
+.step-btn.locked{cursor:not-allowed;opacity:.35;background:var(--bg3);}
+
+/* BADGE */
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap;}
+.badge-dream{background:rgba(167,139,250,.15);color:var(--purple);border:1px solid rgba(167,139,250,.25);}
+.badge-target{background:rgba(79,127,255,.12);color:var(--accent);border:1px solid rgba(79,127,255,.2);}
+.badge-safe{background:rgba(62,207,142,.1);color:var(--green);border:1px solid rgba(62,207,142,.2);}
+
+.memo-inp{background:transparent;border:none;outline:none;color:var(--text2);font-size:12px;font-family:'Noto Sans KR',sans-serif;width:100%;}
+.memo-inp::placeholder{color:var(--text3);}
+.action-btn{background:none;border:none;cursor:pointer;font-size:15px;line-height:1;padding:4px 5px;border-radius:4px;transition:all .15s;}
+.action-btn.edit{color:var(--amber);}.action-btn.edit:hover{background:var(--amber-bg);}
+.action-btn.del{color:var(--text3);}.action-btn.del:hover{color:var(--red);background:var(--red-bg);}
+.empty-state{text-align:center;padding:48px;color:var(--text3);font-size:13px;}
+
+/* BOARD */
+.board{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:4px;}
+.board-col{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);min-height:200px;}
+.board-hdr{background:var(--bg3);padding:10px 12px;display:flex;align-items:center;gap:6px;border-radius:var(--r) var(--r) 0 0;}
+.board-dot{width:7px;height:7px;border-radius:50%;}
+.board-hdr-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;}
+.board-hdr-count{font-size:10px;color:var(--text3);margin-left:2px;}
+.board-body{padding:8px;}
+.board-card{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:8px 10px;margin-bottom:6px;}
+.board-card-name{font-size:12px;font-weight:600;}
+.board-card-meta{font-size:10px;color:var(--text3);margin-top:2px;}
+.board-empty{font-size:11px;color:var(--text3);padding:12px;text-align:center;}
+
+/* DASHBOARD */
+.dash-section{margin-bottom:32px;}
+.dash-section-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.dash-section-title::before{content:'';display:block;width:3px;height:14px;border-radius:2px;background:var(--accent);}
+.dash-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.dash-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.dash-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.dash-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;}
+.dash-card-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:14px;}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.bar-label{font-size:12px;color:var(--text2);min-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bar-label-wide{min-width:130px;}
+.bar-track{flex:1;height:7px;background:var(--bg4);border-radius:4px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;transition:width .5s ease;}
+.bar-count{font-size:11px;color:var(--text3);min-width:22px;text-align:right;font-family:'DM Mono',monospace;}
+.rate-chip{display:inline-flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:3px 10px;font-size:11px;}
+.funnel-row{display:flex;align-items:center;gap:0;margin-bottom:6px;}
+.funnel-label{font-size:11px;color:var(--text2);width:72px;flex-shrink:0;}
+.funnel-bar{height:28px;border-radius:4px;display:flex;align-items:center;padding:0 10px;font-size:11px;font-weight:600;color:#fff;min-width:36px;transition:width .5s;}
+.funnel-pct{font-size:10px;color:var(--text3);margin-left:8px;}
+.group-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:10px;}
+.group-hdr{background:var(--bg3);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+.group-hdr-left{display:flex;align-items:center;gap:8px;}
+.group-hdr-name{font-size:13px;font-weight:600;}
+.group-hdr-count{font-size:11px;color:var(--text3);}
+.group-arrow{font-size:11px;color:var(--text3);transition:transform .2s;}
+.group-arrow.open{transform:rotate(180deg);}
+.group-body{display:none;padding:10px 14px;}
+.group-body.open{display:block;}
+.group-affiliate{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);}
+.group-affiliate:last-child{border-bottom:none;}
+.group-affiliate-name{font-size:12px;font-weight:500;}
+.group-affiliate-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.group-affiliate-tag{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--bg4);color:var(--text3);}
+.tag-pass{background:var(--green-bg);color:var(--green);}
+.tag-fail{background:var(--red-bg);color:var(--red);}
+.tag-prog{background:rgba(79,127,255,.12);color:var(--accent);}
+.keyword-cloud{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;}
+.kw-chip{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:500;border:1px solid;}
+.no-data{text-align:center;padding:32px;color:var(--text3);font-size:13px;}
+.big-num{font-size:28px;font-weight:700;font-family:'DM Mono',monospace;}
+.sub-label{font-size:11px;color:var(--text3);margin-top:2px;}
+.dash-tabs{display:flex;gap:2px;background:var(--bg3);border-radius:var(--rs);padding:3px;width:fit-content;margin-bottom:20px;}
+.dash-tab{padding:6px 16px;font-size:12px;font-weight:500;border:none;border-radius:4px;cursor:pointer;background:transparent;color:var(--text2);font-family:'Noto Sans KR',sans-serif;transition:all .2s;}
+.dash-tab.active{background:var(--bg4);color:var(--text);}
+.dash-view{display:none;}.dash-view.active{display:block;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);width:520px;max-height:90vh;overflow-y:auto;padding:28px;}
+.modal h2{font-size:16px;font-weight:700;margin-bottom:20px;}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:11px;color:var(--text3);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:.6px;}
+.form-inp{width:100%;}.form-textarea{width:100%;min-height:80px;resize:vertical;font-family:'Noto Sans KR',sans-serif;line-height:1.6;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+
+/* ANALYSIS */
+.ana-nav{display:flex;gap:2px;background:var(--bg3);border-radius:var(--rs);padding:3px;width:fit-content;margin-bottom:18px;}
+.ana-tab{padding:6px 18px;font-size:13px;font-weight:500;border:none;border-radius:4px;cursor:pointer;background:transparent;color:var(--text2);font-family:'Noto Sans KR',sans-serif;transition:all .2s;}
+.ana-tab.active{background:var(--bg4);color:var(--text);}
+.ana-section{display:none;}.ana-section.active{display:block;}
+.ana-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
+.ana-row label{font-size:11px;color:var(--text3);}
+.ana-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;}
+.col-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;}
+.result-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:14px;font-size:12px;line-height:1.85;color:var(--text2);min-height:80px;white-space:pre-wrap;margin-top:12px;display:none;}
+.result-box.show{display:block;}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+.loading{animation:pulse 1.2s ease-in-out infinite;color:var(--text3);}
+
+/* SETTINGS */
+.settings-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:16px;max-width:620px;}
+.settings-card h3{font-size:14px;font-weight:600;margin-bottom:6px;}
+.settings-card p{font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.65;}
+.key-row{display:flex;gap:8px;align-items:center;}
+.key-inp{flex:1;font-family:'DM Mono',monospace;font-size:12px;}
+.key-status{font-size:11px;margin-top:8px;}
+.divider{border:none;border-top:1px solid var(--border);margin:24px 0;}
+
+/* TOOLTIP */
+[data-tip]{position:relative;}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:110%;left:50%;transform:translateX(-50%);background:var(--bg4);color:var(--text);font-size:11px;padding:4px 8px;border-radius:4px;white-space:nowrap;border:1px solid var(--border2);pointer-events:none;z-index:10;}
+
+
+/* LOGIN */
+.login-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;}
+.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:44px 48px;width:400px;text-align:center;}
+.login-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:28px;}
+.login-logo-dot{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent);}
+.login-logo-text{font-size:17px;font-weight:700;letter-spacing:-.3px;}
+.login-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.login-desc{font-size:12px;color:var(--text3);margin-bottom:28px;line-height:1.7;}
+.login-field{margin-bottom:14px;text-align:left;}
+.login-field label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:6px;}
+.login-inp{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:10px 14px;color:var(--text);font-size:14px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color .2s;}
+.login-inp:focus{border-color:var(--accent);}
+.login-btn{width:100%;padding:11px;background:rgba(79,127,255,.15);border:1px solid var(--accent2);border-radius:var(--rs);color:var(--accent);font-size:14px;font-weight:600;font-family:'Noto Sans KR',sans-serif;cursor:pointer;transition:all .2s;margin-top:6px;}
+.login-btn:hover{background:rgba(79,127,255,.28);}
+.login-error{font-size:12px;color:var(--red);margin-top:10px;min-height:18px;}
+.login-divider{border:none;border-top:1px solid var(--border);margin:24px 0;}
+.login-note{font-size:11px;color:var(--text3);line-height:1.7;}
+.user-badge{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:4px 14px;cursor:pointer;transition:all .15s;}
+.user-badge:hover{border-color:var(--border);}
+.user-dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+.user-name{font-size:12px;font-weight:500;}
+.user-logout{font-size:11px;color:var(--text3);margin-left:4px;}
+
+@media(max-width:768px){
+  .stats-grid{grid-template-columns:repeat(3,1fr);}
+  .board{grid-template-columns:1fr 1fr;}
+  .ana-2col{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-dot"></div>
+      <span class="login-logo-text">취업 파이프라인 트래커</span>
+    </div>
+    <div class="login-title">내 취업 파이프라인 시작하기</div>
+    <div class="login-desc">이름과 전화번호 뒷 4자리를 입력하면<br>나만의 취업 파이프라인이 만들어집니다.</div>
+
+    <div class="login-field">
+      <label>이름</label>
+      <input class="login-inp" id="login-name" placeholder="예: 홍길동" maxlength="10"
+        onkeydown="if(event.key==='Enter')document.getElementById('login-phone').focus()">
+    </div>
+    <div class="login-field">
+      <label>전화번호 뒷 4자리</label>
+      <input class="login-inp" id="login-phone" placeholder="예: 1234" maxlength="4"
+        type="tel" inputmode="numeric"
+        onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">입장하기 →</button>
+    <div class="login-error" id="login-error"></div>
+
+    <hr class="login-divider">
+    <div class="login-note">
+      ⚠ 이름 + 전화번호 뒷자리는 비밀번호 역할을 합니다.<br>
+      타인에게 공유하지 마세요. 데이터는 이 기기에 저장됩니다.
+    </div>
+  </div>
+</div>
+
+<header class="header">
+  <div class="logo"><div class="logo-dot"></div>취업 파이프라인 트래커</div>
+  <div id="user-badge-wrap" style="margin-right:12px"></div>
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('tracker',this)">파이프라인</button>
+    <button class="tab-btn" onclick="switchTab('board',this)">보드</button>
+    <button class="tab-btn" onclick="switchTab('analysis',this)">자소서 분석</button>
+    <button class="tab-btn" onclick="switchTab('settings',this)">설정</button>
+  </div>
+</header>
+
+<main class="main">
+
+<!-- ══ TRACKER ══ -->
+<div class="section active" id="tab-tracker">
+  <div class="stats-grid" id="stats-grid"></div>
+
+  <div class="add-bar">
+    <label>기업명</label>
+    <input class="inp" id="inp-name" placeholder="기업명" style="width:130px" onkeydown="if(event.key==='Enter')addCompany()">
+    <label>분류</label>
+    <select class="sel" id="inp-type">
+      <option value="dream">⭐ 드림 기업</option>
+      <option value="target" selected>🎯 목표 기업</option>
+      <option value="safe">🛡 안전 기업</option>
+    </select>
+    <label>산업군</label>
+    <select class="sel" id="inp-industry">
+      <option value="">선택</option>
+      <option>대기업</option><option>중견기업</option><option>중소기업</option>
+      <option>스타트업</option><option>외국기업</option>
+    </select>
+    <label>직무</label>
+    <input class="inp" id="inp-job" placeholder="직무명" style="width:120px">
+    <button class="btn" onclick="addCompany()">+ 추가</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:13%">기업명</th>
+          <th style="width:8%">분류</th>
+          <th style="width:9%">산업군</th>
+          <th style="width:11%">직무</th>
+          <th class="center" style="width:8%">서류합격</th>
+          <th class="center" style="width:8%">1차면접</th>
+          <th class="center" style="width:8%">2차면접</th>
+          <th class="center" style="width:8%">최종합격</th>
+          <th class="center" style="width:7%">탈락</th>
+          <th>메모</th>
+          <th style="width:6%"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ BOARD ══ -->
+<div class="section" id="tab-board">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+    <p class="section-title">보드 & 통계 대시보드</p>
+  </div>
+  <p class="section-desc">파이프라인 현황, 직군별 분석, 그룹사별 현황을 한눈에 확인하세요.</p>
+
+  <div class="dash-tabs">
+    <button class="dash-tab active" onclick="switchDash('pipeline',this)">파이프라인</button>
+    <button class="dash-tab" onclick="switchDash('stats',this)">지원 통계</button>
+    <button class="dash-tab" onclick="switchDash('job',this)">직군 분석</button>
+    <button class="dash-tab" onclick="switchDash('group',this)">그룹사 현황</button>
+  </div>
+
+  <!-- 파이프라인 -->
+  <div class="dash-view active" id="dash-pipeline">
+    <div class="board" id="board-grid"></div>
+  </div>
+
+  <!-- 지원 통계 -->
+  <div class="dash-view" id="dash-stats">
+    <div id="stats-dashboard"></div>
+  </div>
+
+  <!-- 직군 분석 -->
+  <div class="dash-view" id="dash-job">
+    <div id="job-dashboard"></div>
+  </div>
+
+  <!-- 그룹사 현황 -->
+  <div class="dash-view" id="dash-group">
+    <div id="group-dashboard"></div>
+  </div>
+</div>
+
+<!-- ══ ANALYSIS ══ -->
+<div class="section" id="tab-analysis">
+  <p class="section-title">자소서 AI 분석</p>
+  <p class="section-desc">STAR 구조·HR 관점·합격 자소서 벤치마크 기준으로 심층 분석합니다. API 키는 설정 탭에서 입력하세요.</p>
+
+  <div class="ana-nav">
+    <button class="ana-tab active" onclick="switchAna('single',this)">단일 분석</button>
+    <button class="ana-tab" onclick="switchAna('compare',this)">비교 분석</button>
+  </div>
+
+  <!-- 단일 -->
+  <div class="ana-section active" id="ana-single">
+    <div class="ana-row">
+      <label>기업</label>
+      <select class="sel" id="ana-company" style="min-width:130px"></select>
+      <label>결과</label>
+      <label style="color:var(--text2);cursor:pointer">
+        <input type="radio" name="ana-result" value="pass" checked> ✅ 합격
+      </label>
+      <label style="color:var(--text2);cursor:pointer">
+        <input type="radio" name="ana-result" value="fail"> ❌ 불합격
+      </label>
+    </div>
+    <div class="form-group">
+      <div class="col-label">자소서 본문</div>
+      <textarea class="inp form-textarea" id="ana1-text" rows="10" placeholder="자소서 본문을 여기에 붙여넣으세요..."></textarea>
+    </div>
+    <button class="btn" id="btn-ana1" onclick="runSingle()">분석 시작</button>
+    <div class="result-box" id="result1"></div>
+  </div>
+
+  <!-- 비교 -->
+  <div class="ana-section" id="ana-compare">
+    <div class="ana-2col">
+      <div>
+        <div class="col-label">✅ 합격 자소서</div>
+        <textarea class="inp form-textarea" id="cmp-pass" rows="10" placeholder="합격한 자소서..."></textarea>
+      </div>
+      <div>
+        <div class="col-label">❌ 불합격 자소서</div>
+        <textarea class="inp form-textarea" id="cmp-fail" rows="10" placeholder="불합격한 자소서..."></textarea>
+      </div>
+    </div>
+    <button class="btn" id="btn-cmp" onclick="runCompare()">비교 분석 시작</button>
+    <div class="result-box" id="result2"></div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS ══ -->
+<div class="section" id="tab-settings">
+  <p class="section-title">설정</p>
+
+  <div class="settings-card">
+    <h3>Anthropic API 키</h3>
+    <p>자소서 AI 분석 기능에 필요합니다.<br>
+    <a href="https://console.anthropic.com/api-keys" target="_blank" style="color:var(--accent)">console.anthropic.com</a>에서 발급받으세요. 키는 이 기기(localStorage)에만 저장됩니다.</p>
+    <div class="key-row">
+      <input class="inp key-inp" id="api-key-inp" type="password" placeholder="sk-ant-...">
+      <button class="btn btn-muted" onclick="toggleKeyVis()" id="key-vis-btn">보기</button>
+      <button class="btn" onclick="saveApiKey()">저장</button>
+      <button class="btn btn-danger" onclick="clearApiKey()">삭제</button>
+    </div>
+    <div class="key-status" id="key-status"></div>
+  </div>
+
+  <div class="settings-card">
+    <h3>데이터 관리</h3>
+    <p>데이터는 브라우저 localStorage에 자동 저장됩니다.<br>JSON 파일로 내보내거나 가져와서 백업/복원하세요.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn" onclick="exportData()">📥 JSON 내보내기</button>
+      <button class="btn btn-muted" onclick="document.getElementById('import-file').click()">📤 JSON 가져오기</button>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(this)">
+      <button class="btn btn-danger" onclick="if(confirm('모든 데이터를 초기화할까요?'))resetData()">🗑 초기화</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- LOADING OVERLAY -->
+<div id="loading-overlay" style="display:none;position:fixed;inset:0;background:rgba(13,15,18,.85);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:14px;">
+  <div style="width:36px;height:36px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite"></div>
+  <div id="loading-msg" style="color:var(--text2);font-size:13px">처리 중...</div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+
+
+<!-- ══ EDIT MODAL ══ -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h2 id="modal-title">기업 수정</h2>
+    <input type="hidden" id="edit-id">
+
+    <div class="form-group">
+      <label class="form-label">기업명</label>
+      <input class="inp form-inp" id="edit-name">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+      <div class="form-group" style="margin:0">
+        <label class="form-label">분류</label>
+        <select class="sel" id="edit-type" style="width:100%">
+          <option value="dream">⭐ 드림 기업</option>
+          <option value="target">🎯 목표 기업</option>
+          <option value="safe">🛡 안전 기업</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label class="form-label">산업군</label>
+        <select class="sel" id="edit-industry" style="width:100%">
+          <option value="">선택</option>
+          <option>대기업</option><option>중견기업</option><option>중소기업</option>
+          <option>스타트업</option><option>외국기업</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">지원 직무</label>
+      <input class="inp form-inp" id="edit-job" placeholder="예: 백엔드 개발자">
+    </div>
+    <div class="form-group">
+      <label class="form-label">직무 상세 / 담당 업무</label>
+      <textarea class="inp form-textarea" id="edit-job-detail" rows="4"
+        placeholder="담당하게 될 업무, 필요한 기술 스택, 팀 역할 등을 자유롭게 메모하세요.&#10;예: REST API 설계 및 개발, AWS 인프라 운영, 코드 리뷰 문화 중시"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">메모</label>
+      <textarea class="inp form-textarea" id="edit-memo" rows="3" placeholder="면접 후기, 특이사항 등"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-muted" onclick="closeModal()">취소</button>
+      <button class="btn" onclick="saveEdit()">저장</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ══════════════════════════════════════════════════════
+// SUPABASE CONFIG — 이 두 값을 교체하세요
+// ══════════════════════════════════════════════════════
+const SUPABASE_URL     = 'https://jytesdvgkjznkzrdbptm.supabase.co';
+const SUPABASE_ANON_KEY= 'sb_publishable_h73sG3aRhjld6pv9465ekA_pffdhH0F';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── CONSTANTS ─────────────────────────────────────────
+const STEP_LABELS = ["서류합격","1차면접","2차면접","최종합격","탈락"];
+const STEP_PREREQ = {0:null,1:0,2:1,3:2,4:null};
+const TYPE_LABELS = {dream:"⭐ 드림",target:"🎯 목표",safe:"🛡 안전"};
+const TYPE_CLS    = {dream:"badge-dream",target:"badge-target",safe:"badge-safe"};
+const STEP_COLORS = ["var(--teal)","var(--accent)","var(--purple)","var(--green)","var(--red)"];
+
+// ── STATE ─────────────────────────────────────────────
+const SEED = [
+  {name:"카카오",type:"dream",industry:"대기업",job:"백엔드 개발자",job_detail:"서버 설계, API 개발, 코드리뷰",steps:[true,false,false,false,false],memo:""},
+  {name:"네이버",type:"dream",industry:"대기업",job:"프론트엔드 개발",job_detail:"React 기반 UI 컴포넌트 개발",steps:[true,true,false,false,false],memo:"포트폴리오 추가 요청"},
+  {name:"라인플러스",type:"target",industry:"외국기업",job:"풀스택 개발자",job_detail:"React + Node.js, 글로벌 서비스",steps:[true,true,true,false,false],memo:""},
+  {name:"토스",type:"target",industry:"스타트업",job:"iOS 개발",job_detail:"Swift 기반 앱 개발",steps:[true,false,false,false,true],memo:"코딩테스트 탈락"},
+  {name:"당근마켓",type:"safe",industry:"스타트업",job:"데이터 엔지니어",job_detail:"ETL 파이프라인 구축, Spark",steps:[true,true,true,true,false],memo:"최종 합격!"},
+];
+
+let currentUser = null;
+let companies   = [];
+
+// ── UTIL ──────────────────────────────────────────────
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function userKey(n,p){ return n.trim()+'_'+p.trim(); }
+function apiKeyStore(){ return 'jt_api_'+(currentUser?.key||'default'); }
+function stepsToDb(s){ return {step_doc:s[0],step_int1:s[1],step_int2:s[2],step_pass:s[3],step_fail:s[4]}; }
+function dbToSteps(r){ return [r.step_doc,r.step_int1,r.step_int2,r.step_pass,r.step_fail]; }
+function dbToCompany(r){
+  return {id:r.id,name:r.name,type:r.type,industry:r.industry||'',
+          job:r.job||'',job_detail:r.job_detail||'',memo:r.memo||'',
+          steps:dbToSteps(r),sort_order:r.sort_order||0};
+}
+function canActivate(c,idx){ const p=STEP_PREREQ[idx]; return p===null||c.steps[p]; }
+
+// ── LOADING ───────────────────────────────────────────
+function setLoading(msg){
+  document.getElementById('loading-overlay').style.display='flex';
+  document.getElementById('loading-msg').textContent=msg||'처리 중...';
+}
+function clearLoading(){ document.getElementById('loading-overlay').style.display='none'; }
+
+// ── AUTH ──────────────────────────────────────────────
+async function doLogin(){
+  const name =document.getElementById('login-name').value.trim();
+  const phone=document.getElementById('login-phone').value.trim();
+  const errEl=document.getElementById('login-error');
+  errEl.textContent='';
+  if(!name){errEl.textContent='이름을 입력해주세요.';return;}
+  if(!/^\d{4}$/.test(phone)){errEl.textContent='전화번호 뒷 4자리를 숫자로 입력해주세요.';return;}
+  const key=userKey(name,phone);
+  setLoading('로그인 중...');
+  try{
+    const {data:existing}=await sb.from('users').select('user_key').eq('user_key',key).maybeSingle();
+    if(!existing){
+      const {error}=await sb.from('users').insert({name,phone,user_key:key});
+      if(error) throw error;
+      if(key===userKey('신지호','5251')){
+        const rows=SEED.map((c,i)=>({user_key:key,name:c.name,type:c.type,
+          industry:c.industry,job:c.job,job_detail:c.job_detail,
+          memo:c.memo,sort_order:i,...stepsToDb(c.steps)}));
+        await sb.from('companies').insert(rows);
+      }
+    }
+    currentUser={name,phone,key};
+    localStorage.setItem('jt_last_user',JSON.stringify({name,phone}));
+    await fetchCompanies();
+    clearLoading();
+    document.getElementById('login-screen').style.display='none';
+    renderUserBadge();
+    render();
+    loadKeyStatus();
+  }catch(e){
+    clearLoading();
+    errEl.textContent=e.message?.includes('Failed to fetch')?
+      'Supabase 연결 실패. 개발자에게 문의하세요.':'오류: '+(e.message||e);
+  }
+}
+
+function doLogout(){
+  if(!confirm('로그아웃 하시겠어요?')) return;
+  currentUser=null; companies=[];
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('login-name').value='';
+  document.getElementById('login-phone').value='';
+  document.getElementById('user-badge-wrap').innerHTML='';
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelector('#tab-tracker').classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+}
+
+function renderUserBadge(){
+  if(!currentUser) return;
+  document.getElementById('user-badge-wrap').innerHTML=`
+    <div class="user-badge" onclick="doLogout()" title="클릭하면 로그아웃">
+      <div class="user-dot"></div>
+      <span class="user-name">${esc(currentUser.name)}</span>
+      <span class="user-logout">로그아웃</span>
+    </div>`;
+}
+
+// ── DB ────────────────────────────────────────────────
+async function fetchCompanies(){
+  const {data,error}=await sb.from('companies').select('*')
+    .eq('user_key',currentUser.key)
+    .order('sort_order',{ascending:true})
+    .order('created_at',{ascending:true});
+  if(error) throw error;
+  companies=(data||[]).map(dbToCompany);
+}
+
+// ── TABS ──────────────────────────────────────────────
+function switchTab(tab,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
+  if(tab==='board'){renderBoard();renderStatsDash();renderJobDash();renderGroupDash();}
+  if(tab==='analysis') renderAnaSelect();
+  if(tab==='settings') loadKeyStatus();
+}
+function switchDash(view,btn){
+  document.querySelectorAll('.dash-view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.dash-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('dash-'+view).classList.add('active');
+  btn.classList.add('active');
+}
+function switchAna(tab,btn){
+  document.querySelectorAll('.ana-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.ana-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('ana-'+tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── STATS ─────────────────────────────────────────────
+function renderStats(){
+  const total=companies.length,passed=companies.filter(c=>c.steps[3]).length,
+        failed=companies.filter(c=>c.steps[4]).length,docs=companies.filter(c=>c.steps[0]).length;
+  document.getElementById('stats-grid').innerHTML=[
+    ["전체 지원",total,"var(--accent)"],["서류합격",docs,"var(--text)"],
+    ["진행 중",total-passed-failed,"var(--amber)"],
+    ["최종합격",passed,"var(--green)"],["불합격",failed,"var(--red)"],
+  ].map(([l,v,c])=>`<div class="stat-card"><div class="stat-label">${l}</div><div class="stat-val" style="color:${c}">${v}</div></div>`).join('');
+}
+
+// ── TABLE ─────────────────────────────────────────────
+function renderTable(){
+  const tb=document.getElementById('tbody');
+  if(!companies.length){tb.innerHTML=`<tr><td colspan="11" class="empty-state">기업을 추가해보세요!</td></tr>`;return;}
+  tb.innerHTML=companies.map(c=>`
+    <tr id="row-${c.id}">
+      <td><strong>${esc(c.name)}</strong></td>
+      <td><span class="badge ${TYPE_CLS[c.type]}">${TYPE_LABELS[c.type]}</span></td>
+      <td style="font-size:12px;color:var(--text2)">${esc(c.industry)||'—'}</td>
+      <td style="font-size:12px;color:var(--text2)">${esc(c.job)||'—'}</td>
+      ${[0,1,2,3,4].map(i=>{
+        const done=c.steps[i],can=canActivate(c,i);
+        const cls=done?`step-btn done-${i}`:(can?'step-btn':'step-btn locked');
+        const txt=done?'✓':(can?'○':'🔒');
+        const tip=done?STEP_LABELS[i]+' 완료':(can?STEP_LABELS[i]:'이전 단계 완료 필요');
+        return `<td style="text-align:center"><button class="${cls}" data-tip="${tip}" onclick="toggleStep(${c.id},${i})">${txt}</button></td>`;
+      }).join('')}
+      <td><input class="memo-inp" value="${esc(c.memo)}" placeholder="메모..." onchange="updateMemo(${c.id},this.value)"></td>
+      <td>
+        <button class="action-btn edit" onclick="openEdit(${c.id})" title="수정">✏</button>
+        <button class="action-btn del" onclick="deleteCompany(${c.id})" title="삭제">×</button>
+      </td>
+    </tr>`).join('');
+}
+
+function render(){ renderStats(); renderTable(); }
+
+// ── CRUD ──────────────────────────────────────────────
+async function addCompany(){
+  const name=document.getElementById('inp-name').value.trim();
+  if(!name){alert('기업명을 입력해주세요.');return;}
+  setLoading('추가 중...');
+  try{
+    const {data,error}=await sb.from('companies').insert({
+      user_key:currentUser.key,name,
+      type:document.getElementById('inp-type').value,
+      industry:document.getElementById('inp-industry').value,
+      job:document.getElementById('inp-job').value.trim(),
+      job_detail:'',memo:'',sort_order:companies.length,
+      ...stepsToDb([false,false,false,false,false])
+    }).select().single();
+    if(error) throw error;
+    companies.push(dbToCompany(data));
+    document.getElementById('inp-name').value='';
+    document.getElementById('inp-job').value='';
+    render();
+  }catch(e){alert('추가 오류: '+e.message);}
+  clearLoading();
+}
+
+async function toggleStep(id,idx){
+  const c=companies.find(x=>x.id===id);
+  if(!c) return;
+  const pre=STEP_PREREQ[idx];
+  if(!c.steps[idx]&&pre!==null&&!c.steps[pre]){
+    alert(`'${STEP_LABELS[idx]}' 단계는 '${STEP_LABELS[pre]}' 완료 후 활성화됩니다.`);return;
+  }
+  if(idx===3&&!c.steps[3]) c.steps[4]=false;
+  if(idx===4&&!c.steps[4]) c.steps[3]=false;
+  if(c.steps[idx]){for(let l=idx+1;l<4;l++) c.steps[l]=false;}
+  c.steps[idx]=!c.steps[idx];
+  render();
+  try{await sb.from('companies').update(stepsToDb(c.steps)).eq('id',id).eq('user_key',currentUser.key);}
+  catch(e){alert('저장 오류: '+e.message);await fetchCompanies();render();}
+}
+
+async function updateMemo(id,val){
+  const c=companies.find(x=>x.id===id);
+  if(!c) return;
+  c.memo=val;
+  try{await sb.from('companies').update({memo:val}).eq('id',id).eq('user_key',currentUser.key);}catch(e){}
+}
+
+async function deleteCompany(id){
+  const c=companies.find(x=>x.id===id);
+  if(!c||!confirm(`'${c.name}'을(를) 삭제할까요?`)) return;
+  companies=companies.filter(x=>x.id!==id);render();
+  try{await sb.from('companies').delete().eq('id',id).eq('user_key',currentUser.key);}
+  catch(e){alert('삭제 오류: '+e.message);await fetchCompanies();render();}
+}
+
+// ── EDIT MODAL ────────────────────────────────────────
+function openEdit(id){
+  const c=companies.find(x=>x.id===id);if(!c) return;
+  document.getElementById('edit-id').value=id;
+  document.getElementById('modal-title').textContent=`'${c.name}' 수정`;
+  document.getElementById('edit-name').value=c.name;
+  document.getElementById('edit-type').value=c.type;
+  document.getElementById('edit-industry').value=c.industry||'';
+  document.getElementById('edit-job').value=c.job||'';
+  document.getElementById('edit-job-detail').value=c.job_detail||'';
+  document.getElementById('edit-memo').value=c.memo||'';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+async function saveEdit(){
+  const id=+document.getElementById('edit-id').value;
+  const c=companies.find(x=>x.id===id);if(!c) return;
+  const fields={
+    name:document.getElementById('edit-name').value.trim()||c.name,
+    type:document.getElementById('edit-type').value,
+    industry:document.getElementById('edit-industry').value,
+    job:document.getElementById('edit-job').value.trim(),
+    job_detail:document.getElementById('edit-job-detail').value.trim(),
+    memo:document.getElementById('edit-memo').value.trim(),
+  };
+  Object.assign(c,fields);closeModal();render();
+  try{await sb.from('companies').update(fields).eq('id',id).eq('user_key',currentUser.key);}
+  catch(e){alert('저장 오류: '+e.message);}
+}
+
+// ── BOARD ─────────────────────────────────────────────
+function renderBoard(){
+  const stages=[
+    {idx:0,label:"서류합격",color:"var(--teal)"},{idx:1,label:"1차면접",color:"var(--accent)"},
+    {idx:2,label:"2차면접",color:"var(--purple)"},{idx:3,label:"최종합격",color:"var(--green)"},
+    {idx:4,label:"불합격",color:"var(--red)"},
+  ];
+  document.getElementById('board-grid').innerHTML=stages.map(s=>{
+    const items=companies.filter(c=>{
+      if(s.idx===3) return c.steps[3];
+      if(s.idx===4) return c.steps[4];
+      if(c.steps[3]||c.steps[4]) return false;
+      if(!c.steps[s.idx]) return false;
+      if(s.idx<2&&c.steps[s.idx+1]) return false;
+      return true;
+    });
+    return `<div class="board-col">
+      <div class="board-hdr"><div class="board-dot" style="background:${s.color}"></div>
+      <span class="board-hdr-label">${s.label}</span><span class="board-hdr-count">(${items.length})</span></div>
+      <div class="board-body">${items.length?items.map(c=>`
+        <div class="board-card"><div class="board-card-name">${esc(c.name)}</div>
+        <div class="board-card-meta">${TYPE_LABELS[c.type]}${c.industry?' · '+esc(c.industry):''}${c.job?' · '+esc(c.job):''}</div>
+        </div>`).join(''):'<div class="board-empty">없음</div>'}</div></div>`;
+  }).join('');
+}
+
+// ── JOB GROUP ENGINE ──────────────────────────────────
+const JOB_GROUPS=[
+  {name:"영업",color:"#f5a623",bg:"rgba(245,166,35,.13)",kw:["영업","세일즈","sales","b2b","b2c","수주","거래처","고객관리","bd","해외영업","영업관리","기술영업","솔루션영업","채널","대리점","유통"]},
+  {name:"마케팅",color:"#a78bfa",bg:"rgba(167,139,250,.13)",kw:["마케팅","marketing","브랜드","광고","콘텐츠","sns","퍼포먼스","crm","그로스","growth","md","캠페인","pr","홍보","디지털마케팅","seo","sem"]},
+  {name:"개발",color:"#4f7fff",bg:"rgba(79,127,255,.13)",kw:["개발","developer","engineer","엔지니어","backend","frontend","fullstack","풀스택","ios","android","devops","sre","infra","인프라","cloud","클라우드","sw","소프트웨어","python","java","react","node"]},
+  {name:"데이터",color:"#34d8b4",bg:"rgba(52,216,180,.13)",kw:["데이터","data","분석","analyst","analytics","bi","머신러닝","딥러닝","ai","인공지능","ml","nlp","통계","sql","etl","pipeline","scientist"]},
+  {name:"기획/전략",color:"#3ecf8e",bg:"rgba(62,207,142,.13)",kw:["기획","전략","strategy","pm","po","product","프로덕트","사업","신사업","경영","컨설팅","ux","서비스기획","플래닝","operations","운영","biz"]},
+  {name:"재무/회계",color:"#f06060",bg:"rgba(240,96,96,.13)",kw:["재무","회계","finance","accounting","세무","ipo","ir","자금","원가","경리","투자","심사","리스크"]},
+  {name:"HR/총무",color:"#ec4899",bg:"rgba(236,72,153,.13)",kw:["hr","인사","채용","hrd","조직","총무","노무","급여","인재","talent","culture","피플","people"]},
+  {name:"물류/SCM",color:"#f97316",bg:"rgba(249,115,22,.13)",kw:["물류","scm","공급망","supply chain","구매","조달","sourcing","재고","창고","포워딩","무역","수출입","통관","배송","유통","logi"]},
+  {name:"연구/R&D",color:"#06b6d4",bg:"rgba(6,182,212,.13)",kw:["연구","r&d","rd","개발연구","기술연구","lab","실험","화학","재료","소재","바이오","신약","임상","의약"]},
+  {name:"디자인",color:"#d946ef",bg:"rgba(217,70,239,.13)",kw:["디자인","design","ui","ux","그래픽","visual","브랜딩","제품디자인","산업디자인","패키지","모션"]},
+];
+
+function detectJobGroup(j){
+  if(!j) return null;
+  const lower=j.toLowerCase().replace(/\s/g,'');
+  for(const g of JOB_GROUPS){for(const kw of g.kw){if(lower.includes(kw.replace(/\s/g,''))) return g;}}
+  return {name:"기타",color:"#8a91a0",bg:"rgba(138,145,160,.13)"};
+}
+function getJobGroupMap(){
+  const map={};
+  for(const c of companies){
+    const g=detectJobGroup(c.job);const key=g?g.name:"기타";
+    if(!map[key]) map[key]={group:g||{name:"기타",color:"#8a91a0",bg:"rgba(138,145,160,.13)"},items:[]};
+    map[key].items.push(c);
+  }
+  return map;
+}
+
+// ── GROUP ENGINE ──────────────────────────────────────
+const GROUP_DB=[
+  {name:"삼성",color:"#1428a0",kw:["삼성","samsung","제일기획","에스원","호텔신라","삼성sds","삼성전자","삼성물산","삼성생명","삼성화재","삼성증권","삼성SDI","삼성전기","삼성중공업","삼성바이오"]},
+  {name:"LG",color:"#a50034",kw:["lg","엘지","LG전자","LG화학","LG유플러스","LG이노텍","LG에너지솔루션","LG디스플레이","LG헬로비전","LG생활건강","LG CNS"]},
+  {name:"SK",color:"#ea0029",kw:["sk","에스케이","SK하이닉스","SK텔레콤","SK이노베이션","SK에너지","SK온","SK바이오","SK네트웍스","SK실트론","SK스퀘어","SKC"]},
+  {name:"현대",color:"#002c5f",kw:["현대","hyundai","기아","현대모비스","현대제철","현대건설","현대글로비스","현대오토에버","현대위아","현대로템","현대미포조선","이노션"]},
+  {name:"롯데",color:"#ed1c24",kw:["롯데","lotte","롯데쇼핑","롯데케미칼","롯데칠성","롯데제과","롯데호텔","롯데건설","롯데렌탈","롯데카드","롯데정보통신","코리아세븐"]},
+  {name:"한화",color:"#ff6600",kw:["한화","hanwha","한화솔루션","한화에어로스페이스","한화오션","한화생명","한화손해보험","한화투자증권","한화시스템","한화건설","갤러리아"]},
+  {name:"포스코",color:"#004a96",kw:["포스코","posco","포스코홀딩스","포스코인터내셔널","포스코건설","포스코DX","포스코퓨처엠","포스코에너지"]},
+  {name:"GS",color:"#006633",kw:["gs","지에스","GS칼텍스","GS리테일","GS건설","GS에너지","GS글로벌","GS홈쇼핑"]},
+  {name:"현대중공업",color:"#003087",kw:["HD현대","현대중공업","현대미포","현대삼호중공업","현대일렉트릭","현대건설기계","현대오일뱅크"]},
+  {name:"신세계",color:"#1a1a1a",kw:["신세계","이마트","스타벅스","SSG","신세계푸드","광주신세계","센트럴시티","까사미아","조선호텔"]},
+  {name:"CJ",color:"#e2001a",kw:["cj","씨제이","CJ제일제당","CJ대한통운","CJ ENM","CJ CGV","CJ올리브영","CJ프레시웨이","CJ바이오"]},
+  {name:"카카오",color:"#fee500",textColor:"#3c1e1e",kw:["카카오","kakao","카카오페이","카카오뱅크","카카오모빌리티","카카오엔터","카카오게임즈","카카오헬스케어","카카오스타일"]},
+  {name:"네이버",color:"#03c75a",kw:["네이버","naver","네이버파이낸셜","네이버웹툰","네이버클라우드","라인","스노우","웍스모바일"]},
+  {name:"쿠팡",color:"#ee2222",kw:["쿠팡","coupang","쿠팡이츠","쿠팡플레이"]},
+  {name:"두산",color:"#002f87",kw:["두산","doosan","두산에너빌리티","두산밥캣","두산퓨얼셀","두산로보틱스"]},
+  {name:"한진",color:"#003082",kw:["한진","hanjin","대한항공","한진칼","진에어"]},
+  {name:"토스",color:"#3182f6",kw:["토스","toss","비바리퍼블리카","토스뱅크","토스페이먼츠","토스증권"]},
+  {name:"배달의민족",color:"#2ac1bc",kw:["배달의민족","배민","우아한형제들","baemin"]},
+  {name:"당근",color:"#ff6f0f",kw:["당근","당근마켓","karrot"]},
+  {name:"라인",color:"#06c755",kw:["라인","line","라인플러스","line plus","라인게임즈"]},
+  {name:"크래프톤",color:"#1c3058",kw:["크래프톤","krafton","배틀그라운드","pubg","블루홀"]},
+  {name:"넥슨",color:"#003087",kw:["넥슨","nexon","넥슨코리아","neople","넥슨게임즈"]},
+  {name:"넷마블",color:"#f01f1f",kw:["넷마블","netmarble"]},
+  {name:"엔씨소프트",color:"#1f57a4",kw:["엔씨","ncsoft","엔씨소프트"]},
+];
+
+function detectGroup(name){
+  const lower=name.toLowerCase().replace(/\s/g,'');
+  for(const g of GROUP_DB){for(const kw of g.kw){if(lower.includes(kw.toLowerCase().replace(/\s/g,''))) return g;}}
+  return null;
+}
+function getGroupMap(){
+  const map={};
+  for(const c of companies){
+    const g=detectGroup(c.name);const key=g?g.name:'__독립__';
+    if(!map[key]) map[key]={group:g,items:[]};
+    map[key].items.push(c);
+  }
+  return map;
+}
+
+// ── STATS DASHBOARD ───────────────────────────────────
+function renderStatsDash(){
+  const el=document.getElementById('stats-dashboard');
+  if(!companies.length){el.innerHTML='<div class="no-data">기업을 추가하면 통계가 표시됩니다.</div>';return;}
+  const total=companies.length,passed=companies.filter(c=>c.steps[3]).length,
+        failed=companies.filter(c=>c.steps[4]).length,docs=companies.filter(c=>c.steps[0]).length,
+        int1=companies.filter(c=>c.steps[1]).length,int2=companies.filter(c=>c.steps[2]).length;
+  const pct=(n,d)=>d?Math.round(n/d*100):0;
+  const indMap={};
+  for(const c of companies){
+    const k=c.industry||'미분류';if(!indMap[k]) indMap[k]={total:0,pass:0,fail:0};
+    indMap[k].total++;if(c.steps[3])indMap[k].pass++;if(c.steps[4])indMap[k].fail++;
+  }
+  const indSorted=Object.entries(indMap).sort((a,b)=>b[1].total-a[1].total);
+  const maxInd=Math.max(...indSorted.map(x=>x[1].total),1);
+  const typeMap={dream:{label:'⭐ 드림',total:0,pass:0,fail:0},target:{label:'🎯 목표',total:0,pass:0,fail:0},safe:{label:'🛡 안전',total:0,pass:0,fail:0}};
+  for(const c of companies){typeMap[c.type].total++;if(c.steps[3])typeMap[c.type].pass++;if(c.steps[4])typeMap[c.type].fail++;}
+
+  el.innerHTML=`
+  <div class="dash-section"><div class="dash-section-title">전체 현황</div>
+  <div class="dash-grid-4">
+    ${[["총 지원",total+"개","var(--accent)"],["합격률",pct(passed,total)+"%","var(--green)"],["진행 중",total-passed-failed+"","var(--amber)"],["불합격",failed+"","var(--red)"]].map(([l,v,c])=>`
+    <div class="dash-card" style="text-align:center"><div class="dash-card-title">${l}</div>
+    <div class="big-num" style="color:${c}">${v}</div></div>`).join('')}
+  </div></div>
+  <div class="dash-grid-2">
+    <div>
+      <div class="dash-section"><div class="dash-section-title">전형 단계별 퍼널</div>
+      <div class="dash-card">
+        ${[['서류합격',docs,total,'var(--teal)'],['1차면접',int1,docs,'var(--accent)'],['2차면접',int2,int1,'var(--purple)'],['최종합격',passed,int2,'var(--green)']].map(([label,n,d,color])=>`
+        <div class="funnel-row"><span class="funnel-label">${label}</span>
+        <div class="funnel-bar" style="background:${color};width:${Math.max(d?Math.round(n/d*100):0,4)}%">${n}</div>
+        <span class="funnel-pct">${d?pct(n,d)+'%':'—'}</span></div>`).join('')}
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          ${[['서류합격률',pct(docs,total)+'%','var(--teal)'],['면접전환율',pct(int1,docs||1)+'%','var(--accent)'],['최종합격률',pct(passed,total)+'%','var(--green)']].map(([l,v,c])=>`
+          <span class="rate-chip"><span style="color:${c};font-weight:600">${v}</span> ${l}</span>`).join('')}
+        </div>
+      </div></div>
+      <div class="dash-section"><div class="dash-section-title">분류별 현황</div>
+      <div class="dash-card">
+        ${Object.entries(typeMap).map(([k,v])=>`
+        <div class="bar-row"><span class="bar-label">${v.label}</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct(v.total,total)}%;background:${k==='dream'?'var(--purple)':k==='target'?'var(--accent)':'var(--green)'}"></div></div>
+        <span class="bar-count">${v.total}</span>
+        <span style="font-size:10px;color:var(--green);margin-left:4px">${v.pass?v.pass+'합':''}</span>
+        <span style="font-size:10px;color:var(--red)">${v.fail?' '+v.fail+'탈':''}</span>
+        </div>`).join('')}
+      </div></div>
+    </div>
+    <div>
+      <div class="dash-section"><div class="dash-section-title">산업군별 지원 현황</div>
+      <div class="dash-card">
+        ${indSorted.length?indSorted.map(([name,v])=>`
+        <div class="bar-row"><span class="bar-label bar-label-wide">${name}</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct(v.total,maxInd)}%;background:var(--accent)"></div></div>
+        <span class="bar-count">${v.total}</span>
+        ${v.pass?`<span style="font-size:10px;color:var(--green);margin-left:4px">${v.pass}합</span>`:''}
+        ${v.fail?`<span style="font-size:10px;color:var(--red)">${v.fail}탈</span>`:''}</div>`).join('')
+        :'<div class="no-data">산업군을 입력하면 표시됩니다.</div>'}
+      </div></div>
+    </div>
+  </div>`;
+}
+
+// ── JOB DASHBOARD ─────────────────────────────────────
+function renderJobDash(){
+  const el=document.getElementById('job-dashboard');
+  const groupMap=getJobGroupMap();const total=companies.length;
+  if(!total){el.innerHTML='<div class="no-data">직무를 입력하면 분석이 표시됩니다.</div>';return;}
+  const wordFreq={};
+  for(const c of companies){if(!c.job)continue;
+    c.job.split(/[\s,·\/]+/).forEach(w=>{if(w.length>=2)wordFreq[w]=(wordFreq[w]||0)+1;});
+  }
+  const topWords=Object.entries(wordFreq).sort((a,b)=>b[1]-a[1]).slice(0,20);
+  const maxW=topWords[0]?.[1]||1;
+  const sorted=Object.entries(groupMap).sort((a,b)=>b[1].items.length-a[1].items.length);
+  el.innerHTML=`
+  <div class="dash-section"><div class="dash-section-title">직무 키워드 클라우드</div>
+  <div class="dash-card">
+    ${topWords.length?`<div class="keyword-cloud">${topWords.map(([w,n])=>{
+      const size=10+Math.round(n/maxW*8);
+      return `<span class="kw-chip" style="font-size:${size}px;background:rgba(79,127,255,${0.08+n/maxW*0.2});color:var(--accent);border-color:rgba(79,127,255,${0.15+n/maxW*0.3})">${w} <span style="opacity:.6;font-size:10px">${n}</span></span>`;
+    }).join('')}</div>`:'<div style="color:var(--text3)">직무를 입력하면 키워드가 표시됩니다.</div>'}
+  </div></div>
+  <div class="dash-section"><div class="dash-section-title">직군별 지원 현황</div>
+  <div class="dash-grid-2">
+    ${sorted.map(([gName,{group:g,items}])=>{
+      const pass=items.filter(c=>c.steps[3]).length,fail=items.filter(c=>c.steps[4]).length,prog=items.length-pass-fail;
+      const pctBar=Math.round(items.length/Math.max(sorted[0][1].items.length,1)*100);
+      return `<div class="dash-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <span style="font-size:13px;font-weight:600;color:${g.color}">${gName}</span>
+          <span style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace;color:${g.color}">${items.length}</span>
+        </div>
+        <div class="bar-track" style="margin-bottom:10px"><div class="bar-fill" style="width:${pctBar}%;background:${g.color}"></div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          ${pass?`<span class="rate-chip"><span style="color:var(--green)">${pass}합격</span></span>`:''}
+          ${fail?`<span class="rate-chip"><span style="color:var(--red)">${fail}탈락</span></span>`:''}
+          ${prog?`<span class="rate-chip"><span style="color:var(--amber)">${prog}진행중</span></span>`:''}
+        </div>
+        ${items.map(c=>{const st=c.steps[3]?'pass':c.steps[4]?'fail':'prog';const stLabel=c.steps[3]?'합격':c.steps[4]?'탈락':'진행';
+          return `<div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text2)">${esc(c.name)}</span><span class="group-affiliate-tag tag-${st}">${stLabel}</span></div>`;}).join('')}
+      </div>`;
+    }).join('')}
+  </div></div>`;
+}
+
+// ── GROUP DASHBOARD ───────────────────────────────────
+function renderGroupDash(){
+  const el=document.getElementById('group-dashboard');
+  if(!companies.length){el.innerHTML='<div class="no-data">기업을 추가하면 그룹사 현황이 표시됩니다.</div>';return;}
+  const groupMap=getGroupMap();
+  const groups=Object.entries(groupMap).filter(([k])=>k!=='__독립__').sort((a,b)=>b[1].items.length-a[1].items.length);
+  const indeps=groupMap['__독립__']?.items||[];
+  el.innerHTML=`
+  <div class="dash-section"><div class="dash-section-title">그룹사별 지원 현황 <span style="font-weight:400;color:var(--text3);font-size:11px">(클릭하면 상세보기)</span></div>
+  ${groups.length?groups.map(([gName,{group:g,items}])=>{
+    const pass=items.filter(c=>c.steps[3]).length,fail=items.filter(c=>c.steps[4]).length,prog=items.length-pass-fail;
+    const gid='grp-'+gName.replace(/\s/g,'');
+    return `<div class="group-card">
+      <div class="group-hdr" onclick="toggleGroup('${gid}')">
+        <div class="group-hdr-left">
+          <div style="width:10px;height:10px;border-radius:50%;background:${g.color}"></div>
+          <span class="group-hdr-name">${gName} 그룹</span>
+          <span class="group-hdr-count">계열사 ${items.length}개 지원</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${pass?`<span class="rate-chip"><span style="color:var(--green)">${pass}합격</span></span>`:''}
+          ${fail?`<span class="rate-chip"><span style="color:var(--red)">${fail}탈락</span></span>`:''}
+          ${prog?`<span class="rate-chip"><span style="color:var(--amber)">${prog}진행</span></span>`:''}
+          <span class="group-arrow" id="arr-${gid}">▼</span>
+        </div>
+      </div>
+      <div class="group-body" id="${gid}">
+        ${items.map(c=>{const st=c.steps[3]?'pass':c.steps[4]?'fail':'prog';const stLabel=c.steps[3]?'최종합격':c.steps[4]?'탈락':'진행중';
+          const stepNames=['서류','1차','2차','최종'];
+          return `<div class="group-affiliate">
+            <div><div class="group-affiliate-name">${esc(c.name)}</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px">${c.industry?esc(c.industry)+' · ':''}${c.job?esc(c.job):''}</div></div>
+            <div class="group-affiliate-tags">
+              ${c.steps.slice(0,4).map((done,i)=>done?`<span class="group-affiliate-tag" style="background:${['var(--teal-bg)','rgba(79,127,255,.12)','var(--purple-bg)','var(--green-bg)'][i]};color:${['var(--teal)','var(--accent)','var(--purple)','var(--green)'][i]}">${stepNames[i]}</span>`:'').join('')}
+              <span class="group-affiliate-tag tag-${st}">${stLabel}</span>
+            </div></div>`;}).join('')}
+      </div></div>`;
+  }).join(''):'<div class="no-data" style="margin-bottom:16px">인식된 그룹사가 없습니다. 삼성전자, 현대자동차 등 계열사명을 입력하면 자동 분류됩니다.</div>'}
+  ${indeps.length?`<div class="dash-section"><div class="dash-section-title">독립 기업 / 스타트업</div>
+  <div class="dash-card"><div style="display:flex;flex-wrap:wrap;gap:8px">
+    ${indeps.map(c=>{const st=c.steps[3]?'pass':c.steps[4]?'fail':'prog';
+      return `<div style="display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:6px 10px">
+        <span style="font-size:12px;font-weight:500">${esc(c.name)}</span>
+        ${c.job?`<span style="font-size:10px;color:var(--text3)">${esc(c.job)}</span>`:''}
+        <span class="group-affiliate-tag tag-${st}">${c.steps[3]?'합격':c.steps[4]?'탈락':'진행'}</span></div>`;}).join('')}
+  </div></div></div>`:''}
+  </div>`;
+}
+
+function toggleGroup(id){
+  document.getElementById(id).classList.toggle('open');
+  document.getElementById('arr-'+id).classList.toggle('open');
+}
+
+// ── ANALYSIS ──────────────────────────────────────────
+function renderAnaSelect(){
+  const sel=document.getElementById('ana-company');
+  sel.innerHTML='<option value="">기업 선택 (선택사항)</option>'+
+    companies.map(c=>`<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
+}
+
+const ANA_FRAMEWORK=`
+[자기소개서 평가 기준]
+1. 3단 구성 충족 여부
+   ① 요약 한 줄: HR이 한눈에 파악할 핵심 1줄 존재 여부
+   ② STAR 구조: 사건(1개)→문제→행동→배운점/역량 자연스러운 전개
+   ③ 지원사 기여 방식: '어떤 역량을 어떤 방식으로' 실제 업무 기준 구체적 서술
+2. HR 관점 작성 규칙
+   - 근거→결론 구조, 추상적·감정적 문장 최소화
+   - 실무 가치(안전·품질·정확성·재발방지·협업·관찰력) 반영
+3. 합격 자소서 벤치마크: 잡코리아·자소설닷컴·캐치·링커리어 합격 자소서와 비교`;
+
+async function callClaude(prompt){
+  const key=localStorage.getItem(apiKeyStore());
+  if(!key) throw new Error('API 키 없음. 설정 탭에서 먼저 입력해주세요.');
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,
+              'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,
+                         messages:[{role:'user',content:prompt}]})
+  });
+  if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.error?.message||`HTTP ${res.status}`);}
+  const data=await res.json();return data.content?.[0]?.text||'';
+}
+
+async function runSingle(){
+  const text=document.getElementById('ana1-text').value.trim();
+  if(!text){alert('자소서 내용을 입력해주세요.');return;}
+  const result=document.querySelector('input[name="ana-result"]:checked').value;
+  const cName=document.getElementById('ana-company').value;
+  const c=companies.find(x=>x.name===cName);
+  const job=c?.job||'',industry=c?.industry||'';
+  const rLabel=result==='pass'?'합격':'불합격';
+  const meta=[cName?`지원 기업: ${cName}`:'',industry?`산업군: ${industry}`:'',job?`지원 직무: ${job}`:''].filter(Boolean).join('\n');
+  const tasks=result==='pass'?
+    `1. 합격 요인 3가지 — 3단구성·STAR·HR관점 기준\n2. 잘 활용된 표현·구조\n3. 다른 자소서에 재활용하는 방법`:
+    `1. 불합격 추정 원인 3가지\n2. 합격 자소서와의 결정적 차이\n3. 구체적 수정 제안 2~3가지`;
+  const prompt=`당신은 10년 경력 채용 전문가이자 자기소개서 분석가입니다.\n${meta}\n분석 유형: ${rLabel} 자소서\n\n${ANA_FRAMEWORK}\n\n---자소서---\n${text}\n---\n\n[분석 결과]\n${tasks}\n\n각 항목은 번호와 소제목으로 구분하고 서술형으로 작성하세요.`;
+  const box=document.getElementById('result1'),btn=document.getElementById('btn-ana1');
+  btn.disabled=true;box.className='result-box show';box.innerHTML='<span class="loading">분석 중... ⏳</span>';
+  try{box.textContent=await callClaude(prompt);}catch(e){box.textContent='오류: '+e.message;}
+  btn.disabled=false;
+}
+
+async function runCompare(){
+  const p=document.getElementById('cmp-pass').value.trim(),f=document.getElementById('cmp-fail').value.trim();
+  if(!p||!f){alert('합격/불합격 자소서를 모두 입력해주세요.');return;}
+  const prompt=`당신은 10년 경력 채용 전문가이자 자기소개서 분석가입니다.\n\n${ANA_FRAMEWORK}\n\n=== 합격 자소서 ===\n${p}\n\n=== 불합격 자소서 ===\n${f}\n\n[비교 분석 결과]\n1. 합격 자소서의 핵심 강점 3가지\n2. 불합격 자소서의 핵심 약점 3가지\n3. 결정적 차이점 요약\n4. 불합격 자소서 구체적 개선 제안 2~3가지\n\n각 항목은 번호와 소제목으로 구분하고 서술형으로 작성하세요.`;
+  const box=document.getElementById('result2'),btn=document.getElementById('btn-cmp');
+  btn.disabled=true;box.className='result-box show';box.innerHTML='<span class="loading">비교 분석 중... ⏳</span>';
+  try{box.textContent=await callClaude(prompt);}catch(e){box.textContent='오류: '+e.message;}
+  btn.disabled=false;
+}
+
+// ── SETTINGS ──────────────────────────────────────────
+let keyVisible=false;
+function toggleKeyVis(){
+  keyVisible=!keyVisible;
+  document.getElementById('api-key-inp').type=keyVisible?'text':'password';
+  document.getElementById('key-vis-btn').textContent=keyVisible?'숨기기':'보기';
+}
+function saveApiKey(){
+  const k=document.getElementById('api-key-inp').value.trim();
+  if(!k){alert('API 키를 입력해주세요.');return;}
+  localStorage.setItem(apiKeyStore(),k);loadKeyStatus();alert('저장되었습니다.');
+}
+function clearApiKey(){
+  if(!confirm('API 키를 삭제할까요?')) return;
+  localStorage.removeItem(apiKeyStore());
+  document.getElementById('api-key-inp').value='';loadKeyStatus();
+}
+function loadKeyStatus(){
+  const k=localStorage.getItem(apiKeyStore())||'';
+  if(k) document.getElementById('api-key-inp').value=k;
+  const el=document.getElementById('key-status');if(!el) return;
+  el.textContent=k?'✓ API 키가 저장되어 있습니다.':'API 키가 없습니다.';
+  el.style.color=k?'var(--green)':'var(--text3)';
+}
+
+// ── DATA MGMT ─────────────────────────────────────────
+function exportData(){
+  const blob=new Blob([JSON.stringify(companies,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='job_tracker_'+new Date().toISOString().slice(0,10)+'.json';a.click();
+}
+async function importData(inp){
+  const file=inp.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=async e=>{
+    try{
+      const d=JSON.parse(e.target.result);if(!Array.isArray(d)) throw new Error();
+      setLoading('가져오는 중...');
+      await sb.from('companies').delete().eq('user_key',currentUser.key);
+      const rows=d.map((c,i)=>({user_key:currentUser.key,name:c.name,type:c.type||'target',
+        industry:c.industry||'',job:c.job||'',job_detail:c.job_detail||'',
+        memo:c.memo||'',sort_order:i,...stepsToDb(c.steps||[false,false,false,false,false])}));
+      if(rows.length) await sb.from('companies').insert(rows);
+      await fetchCompanies();clearLoading();render();alert('가져오기 완료!');
+    }catch(ex){clearLoading();alert('오류: '+ex.message);}
+  };
+  r.readAsText(file);inp.value='';
+}
+async function resetData(){
+  if(!currentUser||!confirm('모든 데이터를 삭제할까요?')) return;
+  setLoading('초기화 중...');
+  await sb.from('companies').delete().eq('user_key',currentUser.key);
+  companies=[];clearLoading();render();
+}
+
+// ── INIT ──────────────────────────────────────────────
+(function initApp(){
+  const last=localStorage.getItem('jt_last_user');
+  if(last){
+    try{
+      const {name,phone}=JSON.parse(last);
+      document.getElementById('login-name').value=name;
+      document.getElementById('login-phone').value=phone;
+    }catch(e){}
+  }
+})();
+</script>
+</body>
+</html>
