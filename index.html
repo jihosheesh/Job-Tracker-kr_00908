@@ -443,6 +443,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <button class="tab-btn" onclick="switchTab('calendar',this)">채용달력</button>
     <button class="tab-btn" onclick="switchTab('board',this)">보드</button>
     <button class="tab-btn" onclick="switchTab('analysis',this)">자소서 분석 및 가이드</button>
+    <button class="tab-btn" onclick="switchTab('feedback',this)">문의</button>
     <button class="tab-btn" onclick="switchTab('settings',this)">설정</button>
   </div>
 </header>
@@ -725,6 +726,62 @@ tr:hover td{background:rgba(255,255,255,.015);}
 
 </div>
 
+
+<!-- ══ FEEDBACK ══ -->
+<div class="section" id="tab-feedback">
+  <!-- 일반 사용자: 피드백 작성 -->
+  <div id="feedback-user-view">
+    <p class="section-title">문의 & 피드백</p>
+    <p class="section-desc">불편한 점, 원하는 기능, 버그 등 자유롭게 남겨주세요. 빠르게 반영해드릴게요!</p>
+    <div class="settings-card" style="max-width:680px">
+      <div class="form-group">
+        <label class="form-label">문의 유형</label>
+        <select class="sel" id="fb-type" style="width:100%">
+          <option value="bug">🐛 버그 신고</option>
+          <option value="feature">✨ 기능 요청</option>
+          <option value="ux">🎨 UI/UX 개선</option>
+          <option value="question">❓ 사용 방법 문의</option>
+          <option value="other">💬 기타</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">제목</label>
+        <input class="inp" id="fb-title" placeholder="한 줄로 요약해주세요" style="width:100%">
+      </div>
+      <div class="form-group">
+        <label class="form-label">내용</label>
+        <textarea class="inp form-textarea" id="fb-content" rows="6"
+          placeholder="자세히 적어주실수록 빠르게 반영됩니다.&#10;예) 채용달력에서 마감일이 표시가 안 됩니다."></textarea>
+      </div>
+      <button class="btn" id="btn-feedback" onclick="submitFeedback()">📨 피드백 제출</button>
+      <div id="fb-result" style="margin-top:10px;font-size:13px;display:none"></div>
+    </div>
+  </div>
+
+  <!-- 관리자 전용: 피드백 목록 -->
+  <div id="feedback-admin-view" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <p class="section-title">피드백 관리</p>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span id="fb-unread-badge" style="display:none;background:var(--red);color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px"></span>
+        <button class="btn btn-muted" onclick="loadFeedbacks()" style="font-size:12px;padding:5px 12px">🔄 새로고침</button>
+      </div>
+    </div>
+    <p class="section-desc">전체 피드백 목록입니다.</p>
+
+    <!-- 필터 -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn btn-muted fb-filter active" onclick="filterFeedback('all',this)" style="font-size:12px;padding:5px 12px">전체</button>
+      <button class="btn btn-muted fb-filter" onclick="filterFeedback('bug',this)" style="font-size:12px;padding:5px 12px">🐛 버그</button>
+      <button class="btn btn-muted fb-filter" onclick="filterFeedback('feature',this)" style="font-size:12px;padding:5px 12px">✨ 기능요청</button>
+      <button class="btn btn-muted fb-filter" onclick="filterFeedback('ux',this)" style="font-size:12px;padding:5px 12px">🎨 UI/UX</button>
+      <button class="btn btn-muted fb-filter" onclick="filterFeedback('unread',this)" style="font-size:12px;padding:5px 12px">🔴 미읽음</button>
+    </div>
+
+    <div id="fb-list"></div>
+  </div>
+</div>
+
 <!-- ══ SETTINGS ══ -->
 <div class="section" id="tab-settings">
   <p class="section-title">설정</p>
@@ -951,6 +1008,7 @@ function switchTab(tab,btn){
   if(tab==='calendar') renderCalendar();
   if(tab==='analysis') renderAnaSelect();
   if(tab==='settings') loadKeyStatus();
+  if(tab==='feedback') renderFeedbackTab();
 }
 function switchDash(view,btn){
   document.querySelectorAll('.dash-view').forEach(v=>v.classList.remove('active'));
@@ -1827,6 +1885,147 @@ function formatDateInput(el){
   if(v.length > 7) v = v.slice(0,7) + '-' + v.slice(7);
   if(v.length > 10) v = v.slice(0,10);
   el.value = v;
+}
+
+
+// ── FEEDBACK ──────────────────────────────────────────
+const ADMIN_KEY = '신지호_5251';
+let allFeedbacks = [];
+let currentFilter = 'all';
+
+function isAdmin(){
+  return currentUser && currentUser.key === ADMIN_KEY;
+}
+
+function renderFeedbackTab(){
+  if(isAdmin()){
+    document.getElementById('feedback-user-view').style.display = 'none';
+    document.getElementById('feedback-admin-view').style.display = 'block';
+    loadFeedbacks();
+  } else {
+    document.getElementById('feedback-user-view').style.display = 'block';
+    document.getElementById('feedback-admin-view').style.display = 'none';
+  }
+}
+
+async function submitFeedback(){
+  const title   = document.getElementById('fb-title').value.trim();
+  const content = document.getElementById('fb-content').value.trim();
+  const type    = document.getElementById('fb-type').value;
+  const result  = document.getElementById('fb-result');
+
+  if(!title || !content){ alert('제목과 내용을 입력해주세요.'); return; }
+
+  const btn = document.getElementById('btn-feedback');
+  btn.disabled = true;
+  btn.textContent = '제출 중...';
+
+  try {
+    const { error } = await sb.from('feedbacks').insert({
+      user_key: currentUser?.key || 'anonymous',
+      user_name: currentUser?.name || '익명',
+      type, title, content,
+      is_read: false,
+      created_at: new Date().toISOString()
+    });
+    if(error) throw error;
+
+    document.getElementById('fb-title').value = '';
+    document.getElementById('fb-content').value = '';
+    result.style.display = 'block';
+    result.style.color = 'var(--green)';
+    result.textContent = '✓ 피드백이 전달되었습니다. 감사합니다!';
+    setTimeout(() => result.style.display = 'none', 4000);
+  } catch(e){
+    result.style.display = 'block';
+    result.style.color = 'var(--red)';
+    result.textContent = '오류: ' + e.message;
+  }
+  btn.disabled = false;
+  btn.textContent = '📨 피드백 제출';
+}
+
+async function loadFeedbacks(){
+  const list = document.getElementById('fb-list');
+  list.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px 0">불러오는 중...</div>';
+
+  try {
+    const { data, error } = await sb.from('feedbacks')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if(error) throw error;
+
+    allFeedbacks = data || [];
+    const unread = allFeedbacks.filter(f => !f.is_read).length;
+    const badge = document.getElementById('fb-unread-badge');
+    if(unread > 0){
+      badge.style.display = 'inline';
+      badge.textContent = `미읽음 ${unread}`;
+    } else {
+      badge.style.display = 'none';
+    }
+    renderFeedbackList();
+  } catch(e){
+    list.innerHTML = `<div style="color:var(--red);font-size:13px">오류: ${e.message}</div>`;
+  }
+}
+
+function filterFeedback(filter, btn){
+  currentFilter = filter;
+  document.querySelectorAll('.fb-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFeedbackList();
+}
+
+function renderFeedbackList(){
+  const list = document.getElementById('fb-list');
+  let items = allFeedbacks;
+  if(currentFilter === 'unread') items = items.filter(f => !f.is_read);
+  else if(currentFilter !== 'all') items = items.filter(f => f.type === currentFilter);
+
+  if(!items.length){
+    list.innerHTML = '<div class="no-data">해당 피드백이 없습니다.</div>';
+    return;
+  }
+
+  const typeMap = {
+    bug:'🐛 버그',feature:'✨ 기능요청',ux:'🎨 UI/UX',question:'❓ 문의',other:'💬 기타'
+  };
+  const clsMap = {
+    bug:'fb-bug',feature:'fb-feature',ux:'fb-ux',question:'fb-question',other:'fb-other'
+  };
+
+  list.innerHTML = items.map(f => {
+    const date = new Date(f.created_at).toLocaleDateString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+    return `<div class="fb-card ${f.is_read?'':'unread'} ${f.type}" id="fb-${f.id}">
+      <div class="fb-header">
+        <div class="fb-title-row">
+          ${!f.is_read?'<div class="fb-unread-dot"></div>':''}
+          <span style="font-size:14px;font-weight:600;color:var(--text)">${esc(f.title)}</span>
+          <span class="fb-badge ${clsMap[f.type]||'fb-other'}">${typeMap[f.type]||f.type}</span>
+        </div>
+        <div class="fb-meta">${esc(f.user_name)} · ${date}</div>
+      </div>
+      <div class="fb-content">${esc(f.content).replace(/\n/g,'<br>')}</div>
+      <div class="fb-actions">
+        ${!f.is_read?`<button class="btn btn-muted" onclick="markRead(${f.id})" style="font-size:11px;padding:4px 10px">✓ 읽음 처리</button>`:'<span style="font-size:11px;color:var(--text3)">✓ 읽음</span>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function markRead(id){
+  try{
+    await sb.from('feedbacks').update({is_read:true}).eq('id',id);
+    const f = allFeedbacks.find(x=>x.id===id);
+    if(f) f.is_read = true;
+    renderFeedbackList();
+    // 뱃지 업데이트
+    const unread = allFeedbacks.filter(x=>!x.is_read).length;
+    const badge = document.getElementById('fb-unread-badge');
+    if(unread>0){badge.style.display='inline';badge.textContent=`미읽음 ${unread}`;}
+    else badge.style.display='none';
+  }catch(e){alert('오류: '+e.message);}
 }
 
 // ── SETTINGS ──────────────────────────────────────────
