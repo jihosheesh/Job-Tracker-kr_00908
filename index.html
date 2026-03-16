@@ -78,11 +78,12 @@ tr:hover td{background:rgba(255,255,255,.015);}
 /* STEP BUTTONS */
 .step-btn{width:36px;height:32px;border-radius:6px;border:1.5px solid var(--border2);background:var(--bg4);cursor:pointer;font-size:13px;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;}
 .step-btn:hover:not(.locked):not(.done){border-color:var(--text2);}
-.step-btn.done-0{border-color:var(--teal);background:var(--teal-bg);color:var(--teal);}
-.step-btn.done-1{border-color:var(--accent);background:rgba(79,127,255,.12);color:var(--accent);}
-.step-btn.done-2{border-color:var(--purple);background:var(--purple-bg);color:var(--purple);}
-.step-btn.done-3{border-color:var(--green);background:var(--green-bg);color:var(--green);}
-.step-btn.done-4{border-color:var(--red);background:var(--red-bg);color:var(--red);}
+.step-btn.done-0{border-color:#8a91a0;background:var(--bg4);color:#8a91a0;}
+.step-btn.done-1{border-color:var(--teal);background:var(--teal-bg);color:var(--teal);}
+.step-btn.done-2{border-color:var(--accent);background:rgba(79,127,255,.12);color:var(--accent);}
+.step-btn.done-3{border-color:var(--purple);background:var(--purple-bg);color:var(--purple);}
+.step-btn.done-4{border-color:var(--green);background:var(--green-bg);color:var(--green);}
+.step-btn.done-5{border-color:var(--red);background:var(--red-bg);color:var(--red);}
 .step-btn.locked{cursor:not-allowed;opacity:.35;background:var(--bg3);}
 
 /* BADGE */
@@ -501,11 +502,12 @@ tr:hover td{background:rgba(255,255,255,.015);}
           <th style="width:8%">분류</th>
           <th style="width:9%">기업규모</th>
           <th style="width:11%">직무</th>
-          <th class="center" style="width:8%">서류합격</th>
-          <th class="center" style="width:8%">1차면접</th>
-          <th class="center" style="width:8%">2차면접</th>
-          <th class="center" style="width:8%">최종합격</th>
-          <th class="center" style="width:7%">탈락</th>
+          <th class="center" style="width:7%">서류제출</th>
+          <th class="center" style="width:7%">서류합격</th>
+          <th class="center" style="width:7%">1차면접</th>
+          <th class="center" style="width:7%">2차면접</th>
+          <th class="center" style="width:7%">최종합격</th>
+          <th class="center" style="width:6%">탈락</th>
           <th style="width:9%">마감일</th>
           <th>메모</th>
           <th style="width:6%"></th>
@@ -809,24 +811,99 @@ tr:hover td{background:rgba(255,255,255,.015);}
 <div class="section" id="tab-settings">
   <p class="section-title">설정</p>
 
+  <!-- 프로필 -->
   <div class="settings-card">
-    <h3>자소서 AI 분석</h3>
-    <p>자소서 분석 기능은 서버를 통해 자동으로 제공됩니다.<br>
-    별도의 API 키 입력 없이 바로 사용 가능합니다. ✓</p>
+    <h3>👤 내 프로필</h3>
+    <p>현재 로그인된 계정 정보입니다.</p>
+    <div style="display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--bg3);border-radius:var(--rs);">
+      <div style="width:40px;height:40px;border-radius:50%;background:rgba(79,127,255,.15);display:flex;align-items:center;justify-content:center;font-size:18px">👤</div>
+      <div>
+        <div id="profile-name" style="font-size:14px;font-weight:600;color:var(--text)"></div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">취업 파이프라인 트래커 사용자</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 목표 설정 -->
+  <div class="settings-card">
+    <h3>🎯 취업 목표 설정</h3>
+    <p>목표를 설정하면 파이프라인 탭 상단에 진행률이 표시됩니다.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div>
+        <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:5px">목표 지원 기업 수</label>
+        <input class="inp" id="goal-companies" type="number" min="1" max="100" placeholder="예: 20" style="width:100%" oninput="saveGoals()">
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:5px">목표 합격 기업 수</label>
+        <input class="inp" id="goal-pass" type="number" min="1" max="20" placeholder="예: 3" style="width:100%" oninput="saveGoals()">
+      </div>
+    </div>
+    <div>
+      <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:5px">목표 직군</label>
+      <input class="inp" id="goal-job" placeholder="예: 영업, 마케팅, 개발 등" style="width:100%" oninput="saveGoals()">
+    </div>
+  </div>
+
+  <!-- 마감일 알림 -->
+  <div class="settings-card">
+    <h3>⏰ 마감 임박 기업</h3>
+    <p>마감일이 7일 이내인 기업 목록입니다.</p>
+    <div id="deadline-alert-list"></div>
+  </div>
+
+  <!-- 자소서 보관함 -->
+  <div class="settings-card">
+    <h3>📁 자소서 보관함</h3>
+    <p>작성한 자소서를 기업별로 저장해두세요. 언제든 불러올 수 있습니다.</p>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <select class="sel" id="essay-company-sel" style="flex:1"></select>
+      <button class="btn" onclick="openEssayModal()">+ 저장</button>
+    </div>
+    <div id="essay-list"></div>
+  </div>
+
+  <!-- 자소서 서버 상태 -->
+  <div class="settings-card">
+    <h3>🤖 자소서 AI 분석 서버</h3>
+    <p>서버를 통해 자동으로 제공됩니다. 별도 API 키 불필요.</p>
     <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--green-bg);border:1px solid rgba(62,207,142,.2);border-radius:var(--rs);">
       <span style="color:var(--green);font-size:16px">✓</span>
       <span style="font-size:13px;color:var(--green)">분석 서버 연결됨 — 바로 사용 가능</span>
     </div>
   </div>
 
+  <!-- 데이터 관리 -->
   <div class="settings-card">
-    <h3>데이터 관리</h3>
-    <p>데이터는 브라우저 localStorage에 자동 저장됩니다.<br>JSON 파일로 내보내거나 가져와서 백업/복원하세요.</p>
+    <h3>💾 데이터 관리</h3>
+    <p>JSON 파일로 내보내거나 가져와서 백업/복원하세요.</p>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <button class="btn" onclick="exportData()">📥 JSON 내보내기</button>
       <button class="btn btn-muted" onclick="document.getElementById('import-file').click()">📤 JSON 가져오기</button>
       <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(this)">
       <button class="btn btn-danger" onclick="if(confirm('모든 데이터를 초기화할까요?'))resetData()">🗑 초기화</button>
+    </div>
+  </div>
+</div>
+
+<!-- 자소서 보관함 모달 -->
+<div class="modal-overlay" id="essay-modal" onclick="if(event.target===this)closeEssayModal()">
+  <div class="modal" style="width:600px">
+    <h2>📁 자소서 저장</h2>
+    <div class="form-group">
+      <label class="form-label">기업</label>
+      <select class="sel" id="essay-modal-company" style="width:100%"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">문항</label>
+      <input class="inp form-inp" id="essay-modal-question" placeholder="예: 지원동기를 작성해주세요">
+    </div>
+    <div class="form-group">
+      <label class="form-label">자소서 내용</label>
+      <textarea class="inp form-textarea" id="essay-modal-content" rows="8" placeholder="자소서 내용을 붙여넣으세요..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-muted" onclick="closeEssayModal()">취소</button>
+      <button class="btn" onclick="saveEssay()">저장</button>
     </div>
   </div>
 </div>
@@ -903,19 +980,19 @@ const SUPABASE_ANON_KEY= 'sb_publishable_h73sG3aRhjld6pv9465ekA_pffdhH0F';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── CONSTANTS ─────────────────────────────────────────
-const STEP_LABELS = ["서류합격","1차면접","2차면접","최종합격","탈락"];
-const STEP_PREREQ = {0:null,1:0,2:1,3:2,4:null};
+const STEP_LABELS = ["서류제출","서류합격","1차면접","2차면접","최종합격","탈락"];
+const STEP_PREREQ = {0:null,1:0,2:1,3:2,4:3,5:null};
 const TYPE_LABELS = {dream:"🎯 목표",target:"🎯 목표",safe:"🛡 안전"};
 const TYPE_CLS    = {dream:"badge-target",target:"badge-target",safe:"badge-safe"};
-const STEP_COLORS = ["var(--teal)","var(--accent)","var(--purple)","var(--green)","var(--red)"];
+const STEP_COLORS = ["#8a91a0","var(--teal)","var(--accent)","var(--purple)","var(--green)","var(--red)"];
 
 // ── STATE ─────────────────────────────────────────────
 const SEED = [
-  {name:"카카오",type:"target",industry:"대기업",job:"백엔드 개발자",job_detail:"서버 설계, API 개발, 코드리뷰",steps:[true,false,false,false,false],memo:"",deadline:""},
-  {name:"네이버",type:"target",industry:"대기업",job:"프론트엔드 개발",job_detail:"React 기반 UI 컴포넌트 개발",steps:[true,true,false,false,false],memo:"포트폴리오 추가 요청"},
-  {name:"라인플러스",type:"target",industry:"외국기업",job:"풀스택 개발자",job_detail:"React + Node.js, 글로벌 서비스",steps:[true,true,true,false,false],memo:""},
-  {name:"토스",type:"target",industry:"스타트업",job:"iOS 개발",job_detail:"Swift 기반 앱 개발",steps:[true,false,false,false,true],memo:"코딩테스트 탈락"},
-  {name:"당근마켓",type:"safe",industry:"스타트업",job:"데이터 엔지니어",job_detail:"ETL 파이프라인 구축, Spark",steps:[true,true,true,true,false],memo:"최종 합격!"},
+  {name:"카카오",type:"target",industry:"대기업",job:"백엔드 개발자",job_detail:"서버 설계, API 개발, 코드리뷰",steps:[true,true,false,false,false,false],memo:"",deadline:""},
+  {name:"네이버",type:"target",industry:"대기업",job:"프론트엔드 개발",job_detail:"React 기반 UI 컴포넌트 개발",steps:[true,true,true,false,false,false],memo:"포트폴리오 추가 요청"},
+  {name:"라인플러스",type:"target",industry:"외국기업",job:"풀스택 개발자",job_detail:"React + Node.js, 글로벌 서비스",steps:[true,true,true,true,false,false],memo:""},
+  {name:"토스",type:"target",industry:"스타트업",job:"iOS 개발",job_detail:"Swift 기반 앱 개발",steps:[true,true,false,false,false,true],memo:"코딩테스트 탈락"},
+  {name:"당근마켓",type:"safe",industry:"스타트업",job:"데이터 엔지니어",job_detail:"ETL 파이프라인 구축, Spark",steps:[true,true,true,true,true,false],memo:"최종 합격!"},
 ];
 
 let currentUser = null;
@@ -925,7 +1002,7 @@ let companies   = [];
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function userKey(n,p){ return n.trim()+'_'+p.trim(); }
 function apiKeyStore(){ return 'jt_api_'+(currentUser?.key||'default'); }
-function stepsToDb(s){ return {step_doc:s[0],step_int1:s[1],step_int2:s[2],step_pass:s[3],step_fail:s[4]}; }
+function stepsToDb(s){ return {step_submit:s[0],step_doc:s[1],step_int1:s[2],step_int2:s[3],step_pass:s[4],step_fail:s[5]}; }
 function deadlineBadge(d){
   if(!d) return '';
   const today=new Date(); today.setHours(0,0,0,0);
@@ -936,7 +1013,7 @@ function deadlineBadge(d){
   if(diff<=7) return `<span class='deadline-badge deadline-soon'>D-${diff}</span>`;
   return `<span class='deadline-badge deadline-ok'>D-${diff}</span>`;
 }
-function dbToSteps(r){ return [r.step_doc,r.step_int1,r.step_int2,r.step_pass,r.step_fail]; }
+function dbToSteps(r){ return [r.step_submit||false,r.step_doc||false,r.step_int1||false,r.step_int2||false,r.step_pass||false,r.step_fail||false]; }
 function dbToCompany(r){
   return {id:r.id,name:r.name,type:r.type,industry:r.industry||'',
           job:r.job||'',job_detail:r.job_detail||'',memo:r.memo||'',
@@ -1030,7 +1107,7 @@ function switchTab(tab,btn){
   if(tab==='board'){renderBoard();renderStatsDash();renderJobDash();renderGroupDash();}
   if(tab==='calendar') renderCalendar();
   if(tab==='analysis') renderAnaSelect();
-  if(tab==='settings') loadKeyStatus();
+  if(tab==='settings'){ loadKeyStatus(); loadSettingsTab(); }
   if(tab==='feedback') renderFeedbackTab();
 }
 function switchDash(view,btn){
@@ -1063,10 +1140,10 @@ function renderStats(){
   const total=companies.length,passed=companies.filter(c=>c.steps[3]).length,
         failed=companies.filter(c=>c.steps[4]).length,docs=companies.filter(c=>c.steps[0]).length;
   document.getElementById('stats-grid').innerHTML=[
-    ["전체 지원",total,"var(--accent)"],["서류합격",docs,"var(--text)"],
+    ["전체 지원",total,"var(--accent)"],["서류제출",submit,"var(--text2)"],["서류합격",docs,"var(--text)"],
     ["진행 중",total-passed-failed,"var(--amber)"],
     ["최종합격",passed,"var(--green)"],["불합격",failed,"var(--red)"],
-  ].map(([l,v,c],i)=>`<div class="stat-card"><div class="stat-label">${l}</div><div class="stat-val" style="color:${i===3||i===4?c:'var(--text)'}">${v}</div></div>`).join('');
+  ].map(([l,v,c],i)=>`<div class="stat-card"><div class="stat-label">${l}</div><div class="stat-val" style="color:${i===4||i===5?c:'var(--text)'}">${v}</div></div>`).join('');
 }
 
 // ── TABLE ─────────────────────────────────────────────
@@ -1084,7 +1161,7 @@ function renderTable(){
       </td>
       <td style="font-size:12px;color:var(--text2)">${esc(c.industry)||'—'}</td>
       <td style="font-size:12px;color:var(--text2)">${esc(c.job)||'—'}</td>
-      ${[0,1,2,3,4].map(i=>{
+      ${[0,1,2,3,4,5].map(i=>{
         const done=c.steps[i],can=canActivate(c,i);
         const cls=done?`step-btn done-${i}`:(can?'step-btn':'step-btn locked');
         const txt=done?'✓':(can?'○':'🔒');
@@ -1178,7 +1255,7 @@ async function addCompany(){
       job:document.getElementById('inp-job').value.trim(),
       job_detail:'',memo:'',deadline:document.getElementById('inp-deadline').value||'',
       sort_order:companies.length,
-      ...stepsToDb([false,false,false,false,false])
+      ...stepsToDb([false,false,false,false,false,false])
     }).select().single();
     if(error) throw error;
     companies.push(dbToCompany(data));
@@ -1207,9 +1284,9 @@ async function toggleStep(id,idx){
   if(!c.steps[idx]&&pre!==null&&!c.steps[pre]){
     alert(`'${STEP_LABELS[idx]}' 단계는 '${STEP_LABELS[pre]}' 완료 후 활성화됩니다.`);return;
   }
-  if(idx===3&&!c.steps[3]) c.steps[4]=false;
-  if(idx===4&&!c.steps[4]) c.steps[3]=false;
-  if(c.steps[idx]){for(let l=idx+1;l<4;l++) c.steps[l]=false;}
+  if(idx===4&&!c.steps[4]) c.steps[5]=false;
+  if(idx===5&&!c.steps[5]) c.steps[4]=false;
+  if(c.steps[idx]){for(let l=idx+1;l<5;l++) c.steps[l]=false;}
   c.steps[idx]=!c.steps[idx];
   render();
   try{await sb.from('companies').update(stepsToDb(c.steps)).eq('id',id).eq('user_key',currentUser.key);}
@@ -1266,17 +1343,17 @@ async function saveEdit(){
 // ── BOARD ─────────────────────────────────────────────
 function renderBoard(){
   const stages=[
-    {idx:0,label:"서류합격",color:"var(--teal)"},{idx:1,label:"1차면접",color:"var(--accent)"},
-    {idx:2,label:"2차면접",color:"var(--purple)"},{idx:3,label:"최종합격",color:"var(--green)"},
-    {idx:4,label:"불합격",color:"var(--red)"},
+    {idx:0,label:"서류제출",color:"#8a91a0"},{idx:1,label:"서류합격",color:"var(--teal)"},
+    {idx:2,label:"1차면접",color:"var(--accent)"},{idx:3,label:"2차면접",color:"var(--purple)"},
+    {idx:4,label:"최종합격",color:"var(--green)"},{idx:5,label:"불합격",color:"var(--red)"},
   ];
   document.getElementById('board-grid').innerHTML=stages.map(s=>{
     const items=companies.filter(c=>{
-      if(s.idx===3) return c.steps[3];
       if(s.idx===4) return c.steps[4];
-      if(c.steps[3]||c.steps[4]) return false;
+      if(s.idx===5) return c.steps[5];
+      if(c.steps[4]||c.steps[5]) return false;
       if(!c.steps[s.idx]) return false;
-      if(s.idx<2&&c.steps[s.idx+1]) return false;
+      if(s.idx<4&&c.steps[s.idx+1]) return false;
       return true;
     });
     return `<div class="board-col">
@@ -1391,12 +1468,12 @@ function renderStatsDash(){
     <div>
       <div class="dash-section"><div class="dash-section-title">전형 단계별 퍼널</div>
       <div class="dash-card">
-        ${[['서류합격',docs,total,'var(--teal)'],['1차면접',int1,docs,'var(--accent)'],['2차면접',int2,int1,'var(--purple)'],['최종합격',passed,int2,'var(--green)']].map(([label,n,d,color])=>`
+        ${[['서류제출',submit,total,'#8a91a0'],['서류합격',docs,submit,'var(--teal)'],['1차면접',int1,docs,'var(--accent)'],['2차면접',int2,int1,'var(--purple)'],['최종합격',passed,int2,'var(--green)']].map(([label,n,d,color])=>`
         <div class="funnel-row"><span class="funnel-label">${label}</span>
         <div class="funnel-bar" style="background:${color};width:${Math.max(d?Math.round(n/d*100):0,4)}%">${n}</div>
         <span class="funnel-pct">${d?pct(n,d)+'%':'—'}</span></div>`).join('')}
         <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-          ${[['서류합격률',pct(docs,total)+'%','var(--teal)'],['면접전환율',pct(int1,docs||1)+'%','var(--accent)'],['최종합격률',pct(passed,total)+'%','var(--green)']].map(([l,v,c])=>`
+          ${[['서류제출률',pct(submit,total)+'%','#8a91a0'],['서류합격률',pct(docs,submit||1)+'%','var(--teal)'],['면접전환율',pct(int1,docs||1)+'%','var(--accent)'],['최종합격률',pct(passed,total)+'%','var(--green)']].map(([l,v,c])=>`
           <span class="rate-chip"><span style="color:${c};font-weight:600">${v}</span> ${l}</span>`).join('')}
         </div>
       </div></div>
@@ -2078,6 +2155,175 @@ function initQA(){
     const list = document.getElementById('qa-list-'+type);
     if(list && list.children.length === 0) addQA(type);
   });
+}
+
+
+// ── SETTINGS FUNCTIONS ────────────────────────────────
+function loadSettingsTab(){
+  // 프로필
+  if(currentUser){
+    const el = document.getElementById('profile-name');
+    if(el) el.textContent = currentUser.name;
+  }
+  // 목표 불러오기
+  const goals = JSON.parse(localStorage.getItem('jt_goals_'+(currentUser?.key||'')) || '{}');
+  const gc = document.getElementById('goal-companies');
+  const gp = document.getElementById('goal-pass');
+  const gj = document.getElementById('goal-job');
+  if(gc) gc.value = goals.companies || '';
+  if(gp) gp.value = goals.pass || '';
+  if(gj) gj.value = goals.job || '';
+
+  // 마감 임박 기업
+  renderDeadlineAlerts();
+  // 자소서 보관함
+  renderEssayList();
+  // 보관함 기업 선택
+  updateEssayCompanySel();
+}
+
+function saveGoals(){
+  const goals = {
+    companies: document.getElementById('goal-companies')?.value || '',
+    pass: document.getElementById('goal-pass')?.value || '',
+    job: document.getElementById('goal-job')?.value || '',
+  };
+  localStorage.setItem('jt_goals_'+(currentUser?.key||''), JSON.stringify(goals));
+}
+
+function renderDeadlineAlerts(){
+  const el = document.getElementById('deadline-alert-list');
+  if(!el) return;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const soon = companies.filter(c => {
+    if(!c.deadline || c.steps[4] || c.steps[5]) return false;
+    const dl = new Date(c.deadline); dl.setHours(0,0,0,0);
+    return (dl - today) / (1000*60*60*24) <= 7;
+  }).sort((a,b) => new Date(a.deadline) - new Date(b.deadline));
+
+  if(!soon.length){
+    el.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:8px 0">마감 임박 기업이 없습니다.</div>';
+    return;
+  }
+  el.innerHTML = soon.map(c => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg3);border-radius:var(--rs);margin-bottom:6px">
+      <div>
+        <span style="font-size:13px;font-weight:600">${esc(c.name)}</span>
+        <span style="font-size:11px;color:var(--text3);margin-left:8px">${esc(c.job)||''}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--text2)">${c.deadline}</span>
+        ${deadlineBadge(c.deadline)}
+      </div>
+    </div>`).join('');
+}
+
+// ── 자소서 보관함 ─────────────────────────────────────
+function getEssays(){ return JSON.parse(localStorage.getItem('jt_essays_'+(currentUser?.key||'')) || '[]'); }
+function saveEssays(list){ localStorage.setItem('jt_essays_'+(currentUser?.key||''), JSON.stringify(list)); }
+
+function updateEssayCompanySel(){
+  ['essay-company-sel','essay-modal-company'].forEach(id => {
+    const sel = document.getElementById(id);
+    if(!sel) return;
+    sel.innerHTML = '<option value="">기업 선택</option>' +
+      companies.map(c=>`<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
+  });
+}
+
+function renderEssayList(){
+  const el = document.getElementById('essay-list');
+  if(!el) return;
+  const essays = getEssays();
+  const filterCo = document.getElementById('essay-company-sel')?.value || '';
+  const filtered = filterCo ? essays.filter(e=>e.company===filterCo) : essays;
+  if(!filtered.length){
+    el.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:8px 0">저장된 자소서가 없습니다.</div>';
+    return;
+  }
+  el.innerHTML = filtered.map((e,i)=>`
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:12px 14px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div>
+          <span style="font-size:12px;font-weight:600;color:var(--text)">${esc(e.company)}</span>
+          <span style="font-size:11px;color:var(--text3);margin-left:8px">${esc(e.question||'문항 없음')}</span>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button onclick="loadEssayToAnalysis(${i})" style="font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--accent);background:rgba(79,127,255,.1);color:var(--accent);cursor:pointer">분석에 불러오기</button>
+          <button onclick="deleteEssay(${i})" style="font-size:11px;padding:3px 8px;border-radius:4px;border:none;background:none;color:var(--text3);cursor:pointer">삭제</button>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.6;max-height:60px;overflow:hidden">${esc(e.content).slice(0,150)}...</div>
+    </div>`).join('');
+}
+
+function openEssayModal(){
+  updateEssayCompanySel();
+  const filterCo = document.getElementById('essay-company-sel')?.value || '';
+  const sel = document.getElementById('essay-modal-company');
+  if(sel && filterCo) sel.value = filterCo;
+  document.getElementById('essay-modal').classList.add('open');
+}
+function closeEssayModal(){ document.getElementById('essay-modal').classList.remove('open'); }
+
+function saveEssay(){
+  const company = document.getElementById('essay-modal-company').value;
+  const question = document.getElementById('essay-modal-question').value.trim();
+  const content = document.getElementById('essay-modal-content').value.trim();
+  if(!company || !content){ alert('기업과 내용을 입력해주세요.'); return; }
+  const essays = getEssays();
+  essays.unshift({ company, question, content, savedAt: new Date().toLocaleDateString('ko-KR') });
+  saveEssays(essays);
+  closeEssayModal();
+  document.getElementById('essay-modal-question').value = '';
+  document.getElementById('essay-modal-content').value = '';
+  renderEssayList();
+}
+
+function deleteEssay(idx){
+  if(!confirm('삭제할까요?')) return;
+  const essays = getEssays();
+  essays.splice(idx,1);
+  saveEssays(essays);
+  renderEssayList();
+}
+
+function loadEssayToAnalysis(idx){
+  const essays = getEssays();
+  const e = essays[idx];
+  if(!e) return;
+  // 자소서 분석 탭으로 이동하고 내용 채우기
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-analysis').classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-btn')[3].classList.add('active');
+  // 제출 전 분석 탭 활성화
+  document.querySelectorAll('.ana-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('ana-single').classList.add('active');
+  document.querySelectorAll('.ana-tab').forEach((b,i)=>b.classList.toggle('active',i===0));
+  // 문항에 내용 채우기
+  setTimeout(()=>{
+    initQA();
+    setTimeout(()=>{
+      const q = document.getElementById('qq-single-1');
+      const a = document.getElementById('qa-single-1-ans');
+      const t = document.getElementById('qt-single-1');
+      if(q) q.value = e.question||'';
+      if(a) a.value = e.content;
+      if(t && e.question){
+        // 문항 유형 자동 감지
+        const lower = e.question.toLowerCase();
+        if(lower.includes('지원동기')||lower.includes('지원 동기')) t.value='motive';
+        else if(lower.includes('성장')||lower.includes('자기소개')) t.value='intro';
+        else if(lower.includes('역량')||lower.includes('경험')||lower.includes('직무')) t.value='competency';
+        else if(lower.includes('장단점')||lower.includes('성격')) t.value='personality';
+        else if(lower.includes('포부')||lower.includes('계획')) t.value='aspiration';
+        else if(lower.includes('팀')||lower.includes('협업')) t.value='teamwork';
+        else if(lower.includes('도전')||lower.includes('실패')) t.value='challenge';
+      }
+    }, 100);
+  }, 100);
+  alert(`'${e.company}' 자소서를 분석 탭에 불러왔습니다.`);
 }
 
 // ── FEEDBACK ──────────────────────────────────────────
