@@ -1468,7 +1468,7 @@ function renderStatsDash(){
     <div>
       <div class="dash-section"><div class="dash-section-title">전형 단계별 퍼널</div>
       <div class="dash-card">
-        ${[['서류제출',submitCount,total,'#8a91a0'],['서류합격',docs,submit,'var(--teal)'],['1차면접',int1,docs,'var(--accent)'],['2차면접',int2,int1,'var(--purple)'],['최종합격',passed,int2,'var(--green)']].map(([label,n,d,color])=>`
+        ${[['서류제출',submitCount,total,'#8a91a0'],['서류합격',docs,submitCount,'var(--teal)'],['1차면접',int1,docs,'var(--accent)'],['2차면접',int2,int1,'var(--purple)'],['최종합격',passed,int2,'var(--green)']].map(([label,n,d,color])=>`
         <div class="funnel-row"><span class="funnel-label">${label}</span>
         <div class="funnel-bar" style="background:${color};width:${Math.max(d?Math.round(n/d*100):0,4)}%">${n}</div>
         <span class="funnel-pct">${d?pct(n,d)+'%':'—'}</span></div>`).join('')}
