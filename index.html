@@ -8,6 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
+  --bg:#f5f6f8; --bg2:#ffffff; --bg3:#f0f1f4; --bg4:#e8eaee;
+  --border:#e0e2e8; --border2:#d0d3da;
+  --text:#1a1d24; --text2:#5a5f6e; --text3:#9199a8;
+  --accent:#4f7fff; --accent2:#3d63cc;
+  --green:#16a05a; --green-bg:#e8f7ef;
+  --red:#e03e3e; --red-bg:#fdeaea;
+  --amber:#d4850a; --amber-bg:#fef3e0;
+  --purple:#6d4fc2; --purple-bg:#f0ecfb;
+  --teal:#0e9e7e; --teal-bg:#e6f7f3;
+  --r:10px; --rs:6px;
+}
+[data-theme="dark"] {
   --bg:#0d0f12; --bg2:#13161b; --bg3:#1a1e25; --bg4:#21262f;
   --border:#2a2f3a; --border2:#343b47;
   --text:#e8eaf0; --text2:#8a91a0; --text3:#555d6e;
@@ -17,7 +29,6 @@
   --amber:#f5a623; --amber-bg:#2e1f05;
   --purple:#a78bfa; --purple-bg:#1a1035;
   --teal:#34d8b4; --teal-bg:#062820;
-  --r:10px; --rs:6px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
@@ -185,6 +196,10 @@ tr:hover td{background:rgba(255,255,255,.015);}
 [data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:110%;left:50%;transform:translateX(-50%);background:var(--bg4);color:var(--text);font-size:11px;padding:4px 8px;border-radius:4px;white-space:nowrap;border:1px solid var(--border2);pointer-events:none;z-index:10;}
 
 
+
+.dark-toggle{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:5px 12px;cursor:pointer;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap;}
+.dark-toggle:hover{border-color:var(--accent);color:var(--accent);}
+
 /* LOGIN */
 .login-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;}
 .login-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:44px 48px;width:400px;text-align:center;}
@@ -284,6 +299,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
 <header class="header">
   <div class="logo"><div class="logo-dot"></div>취업 파이프라인 트래커</div>
   <div id="user-badge-wrap" style="margin-right:12px"></div>
+  <button class="dark-toggle" onclick="toggleDark()" id="dark-btn">🌙 다크모드</button>
   <div class="tab-nav">
     <button class="tab-btn active" onclick="switchTab('tracker',this)">파이프라인</button>
     <button class="tab-btn" onclick="switchTab('calendar',this)">채용달력</button>
@@ -304,7 +320,6 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <input class="inp" id="inp-name" placeholder="기업명" style="width:130px" onkeydown="if(event.key==='Enter')addCompany()">
     <label>분류</label>
     <select class="sel" id="inp-type">
-      <option value="dream">⭐ 드림 기업</option>
       <option value="target" selected>🎯 목표 기업</option>
       <option value="safe">🛡 안전 기업</option>
     </select>
@@ -356,7 +371,6 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <button class="btn btn-muted" onclick="calToday()" style="font-size:12px;padding:5px 12px">오늘</button>
   </div>
   <div class="cal-legend">
-    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--purple)"></div>드림 기업</div>
     <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--accent)"></div>목표 기업</div>
     <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--green)"></div>안전 기업</div>
     <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--text3)"></div>마감일 기준 표시</div>
@@ -452,16 +466,13 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <p class="section-title">설정</p>
 
   <div class="settings-card">
-    <h3>Anthropic API 키</h3>
-    <p>자소서 AI 분석 기능에 필요합니다.<br>
-    <a href="https://console.anthropic.com/api-keys" target="_blank" style="color:var(--accent)">console.anthropic.com</a>에서 발급받으세요. 키는 이 기기(localStorage)에만 저장됩니다.</p>
-    <div class="key-row">
-      <input class="inp key-inp" id="api-key-inp" type="password" placeholder="sk-ant-...">
-      <button class="btn btn-muted" onclick="toggleKeyVis()" id="key-vis-btn">보기</button>
-      <button class="btn" onclick="saveApiKey()">저장</button>
-      <button class="btn btn-danger" onclick="clearApiKey()">삭제</button>
+    <h3>자소서 AI 분석</h3>
+    <p>자소서 분석 기능은 서버를 통해 자동으로 제공됩니다.<br>
+    별도의 API 키 입력 없이 바로 사용 가능합니다. ✓</p>
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--green-bg);border:1px solid rgba(62,207,142,.2);border-radius:var(--rs);">
+      <span style="color:var(--green);font-size:16px">✓</span>
+      <span style="font-size:13px;color:var(--green)">분석 서버 연결됨 — 바로 사용 가능</span>
     </div>
-    <div class="key-status" id="key-status"></div>
   </div>
 
   <div class="settings-card">
@@ -501,7 +512,6 @@ tr:hover td{background:rgba(255,255,255,.015);}
       <div class="form-group" style="margin:0">
         <label class="form-label">분류</label>
         <select class="sel" id="edit-type" style="width:100%">
-          <option value="dream">⭐ 드림 기업</option>
           <option value="target">🎯 목표 기업</option>
           <option value="safe">🛡 안전 기업</option>
         </select>
@@ -551,14 +561,14 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // ── CONSTANTS ─────────────────────────────────────────
 const STEP_LABELS = ["서류합격","1차면접","2차면접","최종합격","탈락"];
 const STEP_PREREQ = {0:null,1:0,2:1,3:2,4:null};
-const TYPE_LABELS = {dream:"⭐ 드림",target:"🎯 목표",safe:"🛡 안전"};
-const TYPE_CLS    = {dream:"badge-dream",target:"badge-target",safe:"badge-safe"};
+const TYPE_LABELS = {dream:"🎯 목표",target:"🎯 목표",safe:"🛡 안전"};
+const TYPE_CLS    = {dream:"badge-target",target:"badge-target",safe:"badge-safe"};
 const STEP_COLORS = ["var(--teal)","var(--accent)","var(--purple)","var(--green)","var(--red)"];
 
 // ── STATE ─────────────────────────────────────────────
 const SEED = [
-  {name:"카카오",type:"dream",industry:"대기업",job:"백엔드 개발자",job_detail:"서버 설계, API 개발, 코드리뷰",steps:[true,false,false,false,false],memo:"",deadline:""},
-  {name:"네이버",type:"dream",industry:"대기업",job:"프론트엔드 개발",job_detail:"React 기반 UI 컴포넌트 개발",steps:[true,true,false,false,false],memo:"포트폴리오 추가 요청"},
+  {name:"카카오",type:"target",industry:"대기업",job:"백엔드 개발자",job_detail:"서버 설계, API 개발, 코드리뷰",steps:[true,false,false,false,false],memo:"",deadline:""},
+  {name:"네이버",type:"target",industry:"대기업",job:"프론트엔드 개발",job_detail:"React 기반 UI 컴포넌트 개발",steps:[true,true,false,false,false],memo:"포트폴리오 추가 요청"},
   {name:"라인플러스",type:"target",industry:"외국기업",job:"풀스택 개발자",job_detail:"React + Node.js, 글로벌 서비스",steps:[true,true,true,false,false],memo:""},
   {name:"토스",type:"target",industry:"스타트업",job:"iOS 개발",job_detail:"Swift 기반 앱 개발",steps:[true,false,false,false,true],memo:"코딩테스트 탈락"},
   {name:"당근마켓",type:"safe",industry:"스타트업",job:"데이터 엔지니어",job_detail:"ETL 파이프라인 구축, Spark",steps:[true,true,true,true,false],memo:"최종 합격!"},
@@ -699,7 +709,7 @@ function renderStats(){
     ["전체 지원",total,"var(--accent)"],["서류합격",docs,"var(--text)"],
     ["진행 중",total-passed-failed,"var(--amber)"],
     ["최종합격",passed,"var(--green)"],["불합격",failed,"var(--red)"],
-  ].map(([l,v,c])=>`<div class="stat-card"><div class="stat-label">${l}</div><div class="stat-val" style="color:${c}">${v}</div></div>`).join('');
+  ].map(([l,v,c],i)=>`<div class="stat-card"><div class="stat-label">${l}</div><div class="stat-val" style="color:${i===3||i===4?c:'var(--text)'}">${v}</div></div>`).join('');
 }
 
 // ── TABLE ─────────────────────────────────────────────
@@ -709,7 +719,12 @@ function renderTable(){
   tb.innerHTML=companies.map(c=>`
     <tr id="row-${c.id}">
       <td><strong>${esc(c.name)}</strong></td>
-      <td><span class="badge ${TYPE_CLS[c.type]}">${TYPE_LABELS[c.type]}</span></td>
+      <td>
+        <select onchange="updateType(${c.id},this.value)" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:3px 7px;color:var(--text);font-size:11px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;outline:none;">
+          <option value="target" ${c.type==='target'?'selected':''}>🎯 목표</option>
+          <option value="safe" ${c.type==='safe'?'selected':''}>🛡 안전</option>
+        </select>
+      </td>
       <td style="font-size:12px;color:var(--text2)">${esc(c.industry)||'—'}</td>
       <td style="font-size:12px;color:var(--text2)">${esc(c.job)||'—'}</td>
       ${[0,1,2,3,4].map(i=>{
@@ -719,7 +734,7 @@ function renderTable(){
         const tip=done?STEP_LABELS[i]+' 완료':(can?STEP_LABELS[i]:'이전 단계 완료 필요');
         return `<td style="text-align:center"><button class="${cls}" data-tip="${tip}" onclick="toggleStep(${c.id},${i})">${txt}</button></td>`;
       }).join('')}
-      <td style="text-align:center">${c.deadline?`<span style='font-size:11px;color:var(--text2)'>${c.deadline.slice(5).replace('-','/')}</span>${deadlineBadge(c.deadline)}`:'<span style="color:var(--text3);font-size:11px">—</span>'}</td>
+      <td style="text-align:center">${c.deadline?`<span style='font-size:11px;color:var(--text2)'>${c.deadline.replace(/-/g,'.')+''}</span>${deadlineBadge(c.deadline)}`:'<span style="color:var(--text3);font-size:11px">—</span>'}</td>
       <td><input class="memo-inp" value="${esc(c.memo)}" placeholder="메모..." onchange="updateMemo(${c.id},this.value)"></td>
       <td>
         <button class="action-btn edit" onclick="openEdit(${c.id})" title="수정">✏</button>
@@ -816,6 +831,16 @@ async function addCompany(){
     render();
   }catch(e){alert('추가 오류: '+e.message);}
   clearLoading();
+}
+
+
+async function updateType(id, val){
+  const c=companies.find(x=>x.id===id);
+  if(!c) return;
+  c.type=val;
+  renderStats();
+  try{await sb.from('companies').update({type:val}).eq('id',id).eq('user_key',currentUser.key);}
+  catch(e){alert('저장 오류: '+e.message);}
 }
 
 async function toggleStep(id,idx){
@@ -1022,7 +1047,7 @@ function renderStatsDash(){
       <div class="dash-card">
         ${Object.entries(typeMap).map(([k,v])=>`
         <div class="bar-row"><span class="bar-label">${v.label}</span>
-        <div class="bar-track"><div class="bar-fill" style="width:${pct(v.total,total)}%;background:${k==='dream'?'var(--purple)':k==='target'?'var(--accent)':'var(--green)'}"></div></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct(v.total,total)}%;background:${k==='target'?'var(--accent)':'var(--green)'}"></div></div>
         <span class="bar-count">${v.total}</span>
         <span style="font-size:10px;color:var(--green);margin-left:4px">${v.pass?v.pass+'합':''}</span>
         <span style="font-size:10px;color:var(--red)">${v.fail?' '+v.fail+'탈':''}</span>
@@ -1161,17 +1186,23 @@ const ANA_FRAMEWORK=`
 3. 합격 자소서 벤치마크: 잡코리아·자소설닷컴·캐치·링커리어 합격 자소서와 비교`;
 
 async function callClaude(prompt){
-  const key=localStorage.getItem(apiKeyStore());
-  if(!key) throw new Error('API 키 없음. 설정 탭에서 먼저 입력해주세요.');
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':key,
-              'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,
-                         messages:[{role:'user',content:prompt}]})
+  // Supabase Edge Function을 통해 Claude API 호출 (API 키 불필요)
+  const EDGE_URL = SUPABASE_URL + '/functions/v1/claude-proxy';
+  const res = await fetch(EDGE_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+    },
+    body: JSON.stringify({ prompt, max_tokens: 1500 })
   });
-  if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.error?.message||`HTTP ${res.status}`);}
-  const data=await res.json();return data.content?.[0]?.text||'';
+  if(!res.ok){
+    const err=await res.json().catch(()=>({}));
+    throw new Error(err.error||`서버 오류 (${res.status})`);
+  }
+  const data=await res.json();
+  if(data.error) throw new Error(data.error);
+  return data.result||'';
 }
 
 async function runSingle(){
@@ -1259,7 +1290,27 @@ async function resetData(){
 }
 
 // ── INIT ──────────────────────────────────────────────
+
+function toggleDark(){
+  const isDark = document.documentElement.getAttribute('data-theme')==='dark';
+  if(isDark){
+    document.documentElement.removeAttribute('data-theme');
+    document.getElementById('dark-btn').textContent='🌙 다크모드';
+    localStorage.setItem('jt_theme','light');
+  } else {
+    document.documentElement.setAttribute('data-theme','dark');
+    document.getElementById('dark-btn').textContent='☀️ 라이트모드';
+    localStorage.setItem('jt_theme','dark');
+  }
+}
+
 (function initApp(){
+  // 테마 복원
+  if(localStorage.getItem('jt_theme')==='dark'){
+    document.documentElement.setAttribute('data-theme','dark');
+    const btn=document.getElementById('dark-btn');
+    if(btn) btn.textContent='☀️ 라이트모드';
+  }
   const last=localStorage.getItem('jt_last_user');
   if(last){
     try{
