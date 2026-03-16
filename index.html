@@ -1559,7 +1559,7 @@ async function callClaude(prompt){
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ prompt, max_tokens: 4000 })
+    body: JSON.stringify({ prompt, max_tokens: 10000 })
   });
   if(!res.ok){
     const err=await res.json().catch(()=>({}));
@@ -1844,7 +1844,7 @@ ${textInput ? '[추가 텍스트 정보]\n' + textInput : ''}
 
       requestBody = JSON.stringify({
         prompt,
-        max_tokens: 4000,
+        max_tokens: 10000,
         image: jpImageBase64,
         image_type: jpImageType
       });
@@ -1877,7 +1877,7 @@ ${textInput}
 
 ---`;
 
-      requestBody = JSON.stringify({ prompt, max_tokens: 4000 });
+      requestBody = JSON.stringify({ prompt, max_tokens: 10000 });
     }
 
     const res = await fetch(EDGE_URL, {
