@@ -1140,7 +1140,7 @@ function renderStats(){
   const total=companies.length,passed=companies.filter(c=>c.steps[3]).length,
         failed=companies.filter(c=>c.steps[4]).length,docs=companies.filter(c=>c.steps[0]).length;
   document.getElementById('stats-grid').innerHTML=[
-    ["전체 지원",total,"var(--accent)"],["서류제출",submit,"var(--text2)"],["서류합격",docs,"var(--text)"],
+    ["전체 지원",total,"var(--accent)"],["서류제출",submitCount,"var(--text2)"],["서류합격",docs,"var(--text)"],
     ["진행 중",total-passed-failed,"var(--amber)"],
     ["최종합격",passed,"var(--green)"],["불합격",failed,"var(--red)"],
   ].map(([l,v,c],i)=>`<div class="stat-card"><div class="stat-label">${l}</div><div class="stat-val" style="color:${i===4||i===5?c:'var(--text)'}">${v}</div></div>`).join('');
@@ -1468,12 +1468,12 @@ function renderStatsDash(){
     <div>
       <div class="dash-section"><div class="dash-section-title">전형 단계별 퍼널</div>
       <div class="dash-card">
-        ${[['서류제출',submit,total,'#8a91a0'],['서류합격',docs,submit,'var(--teal)'],['1차면접',int1,docs,'var(--accent)'],['2차면접',int2,int1,'var(--purple)'],['최종합격',passed,int2,'var(--green)']].map(([label,n,d,color])=>`
+        ${[['서류제출',submitCount,total,'#8a91a0'],['서류합격',docs,submit,'var(--teal)'],['1차면접',int1,docs,'var(--accent)'],['2차면접',int2,int1,'var(--purple)'],['최종합격',passed,int2,'var(--green)']].map(([label,n,d,color])=>`
         <div class="funnel-row"><span class="funnel-label">${label}</span>
         <div class="funnel-bar" style="background:${color};width:${Math.max(d?Math.round(n/d*100):0,4)}%">${n}</div>
         <span class="funnel-pct">${d?pct(n,d)+'%':'—'}</span></div>`).join('')}
         <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-          ${[['서류제출률',pct(submit,total)+'%','#8a91a0'],['서류합격률',pct(docs,submit||1)+'%','var(--teal)'],['면접전환율',pct(int1,docs||1)+'%','var(--accent)'],['최종합격률',pct(passed,total)+'%','var(--green)']].map(([l,v,c])=>`
+          ${[['서류제출률',pct(submitCount,total)+'%','#8a91a0'],['서류합격률',pct(docs,submitCount||1)+'%','var(--teal)'],['면접전환율',pct(int1,docs||1)+'%','var(--accent)'],['최종합격률',pct(passed,total)+'%','var(--green)']].map(([l,v,c])=>`
           <span class="rate-chip"><span style="color:${c};font-weight:600">${v}</span> ${l}</span>`).join('')}
         </div>
       </div></div>
