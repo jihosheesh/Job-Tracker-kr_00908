@@ -593,11 +593,47 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <div class="ana-section active" id="ana-single">
     <div class="guide-card" style="margin-bottom:16px">
       <h4>📌 제출 전 자소서 점검</h4>
-      <p>자소서 문항과 답변을 입력하면 AI가 3단 구성·STAR·3C4P·HR 관점으로 분석해 개선점을 찾아드립니다.</p>
+      <p>채용공고 정보와 자소서를 함께 입력하면 직무 맞춤형 분석을 해드립니다.</p>
     </div>
-    <div class="ana-row" style="margin-bottom:14px">
-      <label>기업</label>
-      <select class="sel" id="ana-company" style="min-width:130px"></select>
+
+    <!-- 기업 + 직무 -->
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:8px">
+        <label style="font-size:12px;color:var(--text2);white-space:nowrap">기업</label>
+        <select class="sel" id="ana-company" style="min-width:130px"></select>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:180px">
+        <label style="font-size:12px;color:var(--text2);white-space:nowrap">직무명</label>
+        <input class="inp" id="jd-title" placeholder="예: 해외영업, 백엔드 개발자" style="flex:1">
+      </div>
+    </div>
+
+    <!-- 채용공고 정보 (접이식) -->
+    <div style="margin-bottom:16px">
+      <button onclick="toggleJD()" id="jd-toggle-btn"
+        style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:8px 14px;font-size:12px;color:var(--text2);cursor:pointer;width:100%;text-align:left;display:flex;align-items:center;justify-content:space-between">
+        <span>📋 채용공고 정보 입력 <span style="color:var(--text3);font-size:11px">(선택사항 — 입력하면 더 정확한 분석)</span></span>
+        <span id="jd-toggle-icon">▼</span>
+      </button>
+      <div id="jd-panel" style="display:none;background:var(--bg3);border:1px solid var(--border2);border-top:none;border-radius:0 0 var(--rs) var(--rs);padding:14px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:600">📌 담당업무</div>
+            <textarea id="jd-duties" rows="5" placeholder="예:&#10;- 해외 고객사 신규 발굴 및 관리&#10;- B2B 제안서 작성 및 영업 협상&#10;- 수출 계약 체결 및 사후 관리"
+              style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rs);padding:10px 12px;color:var(--text);font-size:12px;font-family:Noto Sans KR,sans-serif;outline:none;resize:vertical;box-sizing:border-box;line-height:1.65"></textarea>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:600">✅ 필수역량 / 자격요건</div>
+            <textarea id="jd-requirements" rows="5" placeholder="예:&#10;- 관련 전공 학사 이상&#10;- 영어 비즈니스 커뮤니케이션 가능&#10;- 고객 니즈 분석 및 제안 경험"
+              style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rs);padding:10px 12px;color:var(--text);font-size:12px;font-family:Noto Sans KR,sans-serif;outline:none;resize:vertical;box-sizing:border-box;line-height:1.65"></textarea>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:600">⭐ 우대사항 <span style="font-weight:400">(자격증·어학점수 제외, 경험·역량 위주로)</span></div>
+          <textarea id="jd-preferred" rows="3" placeholder="예:&#10;- 해외 영업 또는 무역 실무 경험자&#10;- 글로벌 고객 대응 경험자"
+            style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rs);padding:10px 12px;color:var(--text);font-size:12px;font-family:Noto Sans KR,sans-serif;outline:none;resize:vertical;box-sizing:border-box;line-height:1.65"></textarea>
+        </div>
+      </div>
     </div>
 
     <!-- 문항별 입력 -->
@@ -1699,9 +1735,10 @@ async function runSingle(step){
 
   // 문항별 맞춤 분석 프롬프트 생성
   const qaItems = getQAItems('single');
+  const jdContext = getJDContext();
   const customPrompt1 = qaItems.length > 0
     ? `당신은 채용 전문가입니다. 아래 자소서를 문항별로 분석해주세요.
-${_singleMeta}
+${_singleMeta}${jdContext}
 
 ${qaItems.map(item=>`
 === 문항 ${item.idx}: ${item.typeLabel} ===
@@ -2339,6 +2376,29 @@ function loadEssayToAnalysis(idx){
     }, 100);
   }, 100);
   alert(`'${e.company}' 자소서를 분석 탭에 불러왔습니다.`);
+}
+
+
+function toggleJD(){
+  const panel = document.getElementById('jd-panel');
+  const icon  = document.getElementById('jd-toggle-icon');
+  const open  = panel.style.display === 'none';
+  panel.style.display = open ? 'block' : 'none';
+  icon.textContent = open ? '▲' : '▼';
+}
+
+function getJDContext(){
+  const title    = document.getElementById('jd-title')?.value.trim() || '';
+  const duties   = document.getElementById('jd-duties')?.value.trim() || '';
+  const reqs     = document.getElementById('jd-requirements')?.value.trim() || '';
+  const preferred= document.getElementById('jd-preferred')?.value.trim() || '';
+  if(!duties && !reqs && !preferred) return '';
+  let ctx = '\n[채용공고 정보]';
+  if(title)     ctx += `\n직무: ${title}`;
+  if(duties)    ctx += `\n\n담당업무:\n${duties}`;
+  if(reqs)      ctx += `\n\n필수역량/자격요건:\n${reqs}`;
+  if(preferred) ctx += `\n\n우대사항(경험/역량 위주, 자격증·어학점수 제외):\n${preferred}`;
+  return ctx;
 }
 
 // ── FEEDBACK ──────────────────────────────────────────
