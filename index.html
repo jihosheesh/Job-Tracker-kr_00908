@@ -1581,9 +1581,8 @@ async function runSingle(){
   const box=document.getElementById('result1'),btn=document.getElementById('btn-ana1');
   btn.disabled=true;
   box.className='result-box show';
-  box.innerHTML='<span class="loading">📋 1단계: 3단 구성 & STAR 분석 중... ⏳</span>';
+  box.textContent='📋 1단계: 3단 구성 & STAR 분석 중... ⏳';
 
-  // ── 1단계: 구성·STAR·강점 분석 ──
   const prompt1=`당신은 10년 경력 채용 전문가입니다.
 ${meta}
 
@@ -1591,22 +1590,20 @@ ${meta}
 ${text}
 ---
 
-[1단계 점검 — 구성·STAR·강점]
-1. 3단 구성 완성도
-   - ① 요약 한 줄 존재 여부 및 평가
-   - ② STAR 구조 (사건→문제→행동→배운점) 흐름 평가
-   - ③ 지원사 기여 방식의 구체성 평가
-2. 핵심 강점 2가지 (본문 문장 직접 인용 후 이유 설명)
-3. 종합 점수 (100점 만점) — 항목별 점수 포함
+[1단계 — 구성·STAR·강점 분석]
+1. 3단 구성 완성도: ①요약한줄 ②STAR구조 ③기여방식 각각 평가
+2. 핵심 강점 2가지 (본문 문장 인용 후 이유)
+3. 종합 점수 (100점 만점, 항목별 점수)
 
-간결하고 핵심만 서술형으로 작성하세요.`;
+간결하게 서술형으로 작성하세요.`;
 
   try{
     const result1 = await callClaude(prompt1);
-    box.innerHTML = result1.replace(/\n/g,'<br>');
-    box.innerHTML += '<br><br><hr style="border-color:var(--border);margin:14px 0"><span class="loading">📝 2단계: 3C4P & 개선사항 분석 중... ⏳</span>';
+    box.textContent = result1;
 
-    // ── 2단계: 3C4P + 개선사항 ──
+    // 구분선 텍스트 추가
+    box.textContent += '\n\n' + '─'.repeat(40) + '\n📝 2단계: 3C4P & 개선사항 분석 중... ⏳';
+
     const prompt2=`당신은 10년 경력 채용 전문가입니다.
 ${meta}
 
@@ -1614,24 +1611,18 @@ ${meta}
 ${text}
 ---
 
-[2단계 점검 — 3C4P & 개선사항]
-1. 3C4P 분석
-   - Customer: 혜택받는 대상과 니즈가 명확한지
-   - Company: 나의 상황과 역할이 구체적인지
-   - Competitor: 벤치마킹/비교 요소가 있는지
-   - Product: 결과가 수치로 표현됐는지
-   - Place: 핵심 문제 발견과 해결이 있는지
-   - Price: 효율을 높인 행동이 있는지
-   - Promotion: 협업·소통·문서화가 있는지
-2. 개선 필요 사항 2~3가지 (원문 인용 → 구체적 수정 예시)
+[2단계 — 3C4P & 개선사항]
+1. 3C4P 분석 (Customer/Company/Competitor/Product/Place/Price/Promotion 각각 한 줄 평가)
+2. 개선 필요 사항 2~3가지 (원문 인용 → 수정 예시)
 
-간결하고 핵심만 서술형으로 작성하세요.`;
+간결하게 서술형으로 작성하세요.`;
 
     const result2 = await callClaude(prompt2);
-    // 로딩 텍스트 제거하고 2단계 결과 추가
-    box.innerHTML = box.innerHTML.replace('<span class="loading">📝 2단계: 3C4P & 개선사항 분석 중... ⏳</span>', result2.replace(/\n/g,'<br>'));
+    // 로딩 텍스트 제거하고 결과 추가
+    const current = box.textContent;
+    box.textContent = current.replace('\n\n' + '─'.repeat(40) + '\n📝 2단계: 3C4P & 개선사항 분석 중... ⏳', '\n\n' + '─'.repeat(40) + '\n' + result2);
 
-  }catch(e){box.textContent='오류: '+e.message;}
+  }catch(e){box.textContent += '\n\n오류: '+e.message;}
   btn.disabled=false;
 }
 
