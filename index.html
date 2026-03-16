@@ -1559,7 +1559,7 @@ async function callClaude(prompt){
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ prompt, max_tokens: 10000 })
+    body: JSON.stringify({ prompt, max_tokens: 6000 })
   });
   if(!res.ok){
     const err=await res.json().catch(()=>({}));
@@ -1577,27 +1577,61 @@ async function runSingle(){
   const c=companies.find(x=>x.name===cName);
   const job=c?.job||'',industry=c?.industry||'';
   const meta=[cName?`지원 기업: ${cName}`:'',industry?`산업군: ${industry}`:'',job?`지원 직무: ${job}`:''].filter(Boolean).join('\n');
-  const prompt=`당신은 10년 경력 채용 전문가이자 자기소개서 분석가입니다.
-${meta}
-분석 유형: 제출 전 자소서 점검
 
-${ANA_FRAMEWORK}
+  const box=document.getElementById('result1'),btn=document.getElementById('btn-ana1');
+  btn.disabled=true;
+  box.className='result-box show';
+  box.innerHTML='<span class="loading">📋 1단계: 3단 구성 & STAR 분석 중... ⏳</span>';
+
+  // ── 1단계: 구성·STAR·강점 분석 ──
+  const prompt1=`당신은 10년 경력 채용 전문가입니다.
+${meta}
 
 ---자소서---
 ${text}
 ---
 
-[점검 결과]
-1. 3단 구성 완성도 — ①요약한줄 ②STAR구조 ③기여방식 각각 평가
-2. 3C4P 분석 — Customer/Company/Competitor/Product/Place/Price/Promotion 항목별 충족 여부
-3. 핵심 강점 2가지 (본문 문장 인용)
-4. 개선 필요 사항 2~3가지 (구체적 수정 예시 포함)
-5. 종합 점수 (100점 만점, 항목별 점수 포함)
+[1단계 점검 — 구성·STAR·강점]
+1. 3단 구성 완성도
+   - ① 요약 한 줄 존재 여부 및 평가
+   - ② STAR 구조 (사건→문제→행동→배운점) 흐름 평가
+   - ③ 지원사 기여 방식의 구체성 평가
+2. 핵심 강점 2가지 (본문 문장 직접 인용 후 이유 설명)
+3. 종합 점수 (100점 만점) — 항목별 점수 포함
 
-각 항목은 번호와 소제목으로 구분하고 서술형으로 작성하세요.`;
-  const box=document.getElementById('result1'),btn=document.getElementById('btn-ana1');
-  btn.disabled=true;box.className='result-box show';box.innerHTML='<span class="loading">점검 중... ⏳</span>';
-  try{box.textContent=await callClaude(prompt);}catch(e){box.textContent='오류: '+e.message;}
+간결하고 핵심만 서술형으로 작성하세요.`;
+
+  try{
+    const result1 = await callClaude(prompt1);
+    box.innerHTML = result1.replace(/\n/g,'<br>');
+    box.innerHTML += '<br><br><hr style="border-color:var(--border);margin:14px 0"><span class="loading">📝 2단계: 3C4P & 개선사항 분석 중... ⏳</span>';
+
+    // ── 2단계: 3C4P + 개선사항 ──
+    const prompt2=`당신은 10년 경력 채용 전문가입니다.
+${meta}
+
+---자소서---
+${text}
+---
+
+[2단계 점검 — 3C4P & 개선사항]
+1. 3C4P 분석
+   - Customer: 혜택받는 대상과 니즈가 명확한지
+   - Company: 나의 상황과 역할이 구체적인지
+   - Competitor: 벤치마킹/비교 요소가 있는지
+   - Product: 결과가 수치로 표현됐는지
+   - Place: 핵심 문제 발견과 해결이 있는지
+   - Price: 효율을 높인 행동이 있는지
+   - Promotion: 협업·소통·문서화가 있는지
+2. 개선 필요 사항 2~3가지 (원문 인용 → 구체적 수정 예시)
+
+간결하고 핵심만 서술형으로 작성하세요.`;
+
+    const result2 = await callClaude(prompt2);
+    // 로딩 텍스트 제거하고 2단계 결과 추가
+    box.innerHTML = box.innerHTML.replace('<span class="loading">📝 2단계: 3C4P & 개선사항 분석 중... ⏳</span>', result2.replace(/\n/g,'<br>'));
+
+  }catch(e){box.textContent='오류: '+e.message;}
   btn.disabled=false;
 }
 
@@ -1645,14 +1679,12 @@ ${ANA_FRAMEWORK}
 ${text}
 ---
 
-[합격 요인 심층 분석]
-1. 3C4P 관점 강점 — Customer/Company/Competitor/4P 항목별로 잘 된 부분 분석
-2. STAR 구조 완성도 — 어떤 부분이 설득력 있게 작성됐는지
-3. 지원동기 4원칙 충족 여부 — Why Us, 경험연결, 직무적합성, 차별성
-4. 합격을 이끈 핵심 문장 3개 인용 및 이유 설명
-5. 이 패턴을 내 자소서에 적용하는 방법
+[합격 요인 분석 — 핵심만]
+1. STAR+3단구성 강점 — 잘 된 부분 3가지 (본문 인용)
+2. 합격을 이끈 핵심 문장 2개 인용 및 이유
+3. 내 자소서에 바로 적용할 수 있는 패턴 2가지
 
-각 항목은 번호와 소제목으로 구분하고 서술형으로 작성하세요.`;
+번호와 소제목으로 구분, 서술형으로 간결하게 작성하세요.`;
   const box=document.getElementById('result-pass'),btn=document.getElementById('btn-pass');
   btn.disabled=true;box.className='result-box show';box.innerHTML='<span class="loading">합격 요인 분석 중... ⏳</span>';
   try{box.textContent=await callClaude(prompt);}catch(e){box.textContent='오류: '+e.message;}
@@ -1677,14 +1709,12 @@ ${ANA_FRAMEWORK}
 ${text}
 ---
 
-[불합격 원인 심층 진단]
-1. 3C4P 관점 약점 — Customer/Company/Competitor/4P 항목별로 부족한 부분
-2. STAR 구조 문제점 — 어느 단계가 빠졌거나 설득력이 약한지
-3. 지원동기 4원칙 미충족 항목 — 구체적으로 어떤 부분이 부족한지
-4. 불합격 유발 문장 2~3개 인용 및 문제 설명
-5. 항목별 수정 예시 문장 제공 (원문 → 개선문 형식)
+[불합격 원인 진단 — 핵심만]
+1. 핵심 약점 3가지 — STAR+3C4P 기준 (본문 인용)
+2. 문제 문장 2개 인용 → 개선문 예시 제공
+3. 가장 시급히 고쳐야 할 것 1가지
 
-각 항목은 번호와 소제목으로 구분하고 서술형으로 작성하세요.`;
+번호와 소제목으로 구분, 서술형으로 간결하게 작성하세요.`;
   const box=document.getElementById('result-fail'),btn=document.getElementById('btn-fail');
   btn.disabled=true;box.className='result-box show';box.innerHTML='<span class="loading">불합격 원인 분석 중... ⏳</span>';
   try{box.textContent=await callClaude(prompt);}catch(e){box.textContent='오류: '+e.message;}
@@ -1844,7 +1874,7 @@ ${textInput ? '[추가 텍스트 정보]\n' + textInput : ''}
 
       requestBody = JSON.stringify({
         prompt,
-        max_tokens: 10000,
+        max_tokens: 6000,
         image: jpImageBase64,
         image_type: jpImageType
       });
@@ -1877,7 +1907,7 @@ ${textInput}
 
 ---`;
 
-      requestBody = JSON.stringify({ prompt, max_tokens: 10000 });
+      requestBody = JSON.stringify({ prompt, max_tokens: 6000 });
     }
 
     const res = await fetch(EDGE_URL, {
