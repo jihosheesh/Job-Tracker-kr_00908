@@ -34,8 +34,8 @@
 body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
 
 /* HEADER */
-.header{border-bottom:1px solid var(--border);padding:0;position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur(14px);}.header-top{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:48px;}.header-tabs{display:flex;align-items:center;padding:0 20px 8px;gap:2px;overflow-x:auto;}
-.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;}
+.header{border-bottom:1px solid var(--border);padding:0;position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur(14px);}.header-top{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:44px;gap:8px;}.header-tabs{display:flex;align-items:center;padding:0 20px 8px;gap:2px;overflow-x:auto;}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;white-space:nowrap;}
 .logo-dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);}
 .tab-nav{display:flex;gap:2px;background:var(--bg3);border-radius:var(--rs);padding:3px;flex-wrap:nowrap;}
 .tab-btn{padding:6px 14px;font-size:12px;font-weight:500;border:none;border-radius:4px;cursor:pointer;transition:all .2s;background:transparent;color:var(--text2);font-family:'Noto Sans KR',sans-serif;white-space:nowrap;}
@@ -211,7 +211,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
 
 
 
-.dark-toggle{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:5px 12px;cursor:pointer;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap;}
+.dark-toggle{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:5px 10px;cursor:pointer;font-size:16px;color:var(--text2);display:flex;align-items:center;transition:all .2s;white-space:nowrap;}
 .dark-toggle:hover{border-color:var(--accent);color:var(--accent);}
 
 
@@ -254,11 +254,11 @@ tr:hover td{background:rgba(255,255,255,.015);}
 .login-error{font-size:12px;color:var(--red);margin-top:10px;min-height:18px;}
 .login-divider{border:none;border-top:1px solid var(--border);margin:24px 0;}
 .login-note{font-size:11px;color:var(--text3);line-height:1.7;}
-.user-badge{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:4px 14px;cursor:pointer;transition:all .15s;}
+.user-badge{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:3px 10px;cursor:pointer;transition:all .15s;}
 .user-badge:hover{border-color:var(--border);}
 .user-dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
-.user-name{font-size:12px;font-weight:500;}
-.user-logout{font-size:11px;color:var(--text3);margin-left:4px;}
+.user-name{font-size:11px;font-weight:500;}
+.user-logout{font-size:10px;color:var(--text3);}
 
 
 /* CALENDAR */
@@ -436,10 +436,10 @@ tr:hover td{background:rgba(255,255,255,.015);}
 
 <header class="header">
   <div class="header-top">
-    <div class="logo"><div class="logo-dot"></div>취업 파이프라인 트래커</div>
+    <div class="logo"><div class="logo-dot"></div>취업 트래커</div>
     <div style="display:flex;align-items:center;gap:10px">
       <div id="user-badge-wrap"></div>
-      <button class="dark-toggle" onclick="toggleDark()" id="dark-btn">🌙 다크모드</button>
+      <button class="dark-toggle" onclick="toggleDark()" id="dark-btn">🌙</button>
     </div>
   </div>
   <div class="header-tabs">
@@ -2096,11 +2096,11 @@ function toggleDark(){
   const isDark = document.documentElement.getAttribute('data-theme')==='dark';
   if(isDark){
     document.documentElement.removeAttribute('data-theme');
-    document.getElementById('dark-btn').textContent='🌙 다크모드';
+    document.getElementById('dark-btn').textContent='🌙';
     localStorage.setItem('jt_theme','light');
   } else {
     document.documentElement.setAttribute('data-theme','dark');
-    document.getElementById('dark-btn').textContent='☀️ 라이트모드';
+    document.getElementById('dark-btn').textContent='☀️';
     localStorage.setItem('jt_theme','dark');
   }
 }
@@ -2110,7 +2110,7 @@ function toggleDark(){
   if(localStorage.getItem('jt_theme')==='dark'){
     document.documentElement.setAttribute('data-theme','dark');
     const btn=document.getElementById('dark-btn');
-    if(btn) btn.textContent='☀️ 라이트모드';
+    if(btn) btn.textContent='☀️';
   }
   const last=localStorage.getItem('jt_last_user');
   if(last){
