@@ -284,6 +284,11 @@ tr:hover td{background:rgba(255,255,255,.015);}
 .cal-cell.today .cal-date{color:var(--accent);background:var(--accent);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;}
 .cal-event{font-size:10px;font-weight:500;padding:2px 5px;border-radius:3px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;line-height:1.4;}
 .cal-event.dream{background:rgba(167,139,250,.2);color:var(--purple);}
+.cal-event.ind-대기업{background:rgba(79,127,255,.18);color:var(--accent);}
+.cal-event.ind-중견기업{background:rgba(245,166,35,.18);color:var(--amber);}
+.cal-event.ind-중소기업{background:rgba(138,145,160,.15);color:var(--text2);}
+.cal-event.ind-외국기업{background:rgba(138,145,160,.15);color:var(--text2);}
+.cal-event.ind-스타트업{background:rgba(62,207,142,.15);color:var(--green);}
 .cal-event.target{background:rgba(79,127,255,.2);color:var(--accent);}
 .cal-event.safe{background:rgba(62,207,142,.2);color:var(--green);}
 .cal-event.passed{background:rgba(62,207,142,.15);color:var(--green);text-decoration:line-through;opacity:.7;}
@@ -533,9 +538,10 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <button class="btn btn-muted" onclick="calToday()" style="font-size:12px;padding:5px 12px">오늘</button>
   </div>
   <div class="cal-legend">
-    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--accent)"></div>목표 기업</div>
-    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--green)"></div>안전 기업</div>
-    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--text3)"></div>마감일 기준 표시</div>
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--accent)"></div>대기업</div>
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--amber)"></div>중견기업</div>
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--text3)"></div>중소/외국기업</div>
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--green)"></div>스타트업</div>
   </div>
   <div class="cal-grid" id="cal-grid"></div>
 </div>
@@ -1270,7 +1276,8 @@ function renderCalendar(){
     const dateHtml = isToday?`<div class="cal-date"><span style="background:var(--accent);color:#fff;width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center">${day}</span></div>`
                             :`<div class="cal-date" style="color:${(new Date(calYear,calMonth,day).getDay()===0)?'var(--red)':(new Date(calYear,calMonth,day).getDay()===6)?'var(--accent)':'var(--text2)'}">${day}</div>`;
     const evHtml = events.slice(0,3).map(c=>{
-      const statusCls = c.steps[3]?'passed':c.steps[4]?'failed':c.type;
+      const indCls = 'ind-'+(c.industry||'중소기업');
+      const statusCls = c.steps[4]?'passed':c.steps[5]?'failed':indCls;
       return `<div class="cal-event ${statusCls}" title="${c.name} — ${c.job||'직무미입력'}">${c.name}</div>`;
     }).join('') + (events.length>3?`<div style="font-size:9px;color:var(--text3)">+${events.length-3}개</div>`:'');
     html += `<div class="${cls}">${dateHtml}${evHtml}</div>`;
@@ -1503,7 +1510,7 @@ function renderStatsDash(){
   }
   const indSorted=Object.entries(indMap).sort((a,b)=>b[1].total-a[1].total);
   const maxInd=Math.max(...indSorted.map(x=>x[1].total),1);
-  const typeMap={dream:{label:'⭐ 드림',total:0,pass:0,fail:0},target:{label:'🎯 목표',total:0,pass:0,fail:0},safe:{label:'🛡 안전',total:0,pass:0,fail:0}};
+  const typeMap={target:{label:'🎯 목표',total:0,pass:0,fail:0},safe:{label:'🛡 안전',total:0,pass:0,fail:0}};
   for(const c of companies){typeMap[c.type].total++;if(c.steps[3])typeMap[c.type].pass++;if(c.steps[4])typeMap[c.type].fail++;}
 
   el.innerHTML=`
