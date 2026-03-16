@@ -37,8 +37,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .header{border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;background:var(--bg2);backdrop-filter:blur(14px);}
 .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;}
 .logo-dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);}
-.tab-nav{display:flex;gap:2px;background:var(--bg3);border-radius:var(--rs);padding:3px;}
-.tab-btn{padding:6px 16px;font-size:13px;font-weight:500;border:none;border-radius:4px;cursor:pointer;transition:all .2s;background:transparent;color:var(--text2);font-family:'Noto Sans KR',sans-serif;}
+.tab-nav{display:flex;gap:2px;background:var(--bg3);border-radius:var(--rs);padding:3px;flex-wrap:nowrap;overflow-x:auto;}
+.tab-btn{padding:5px 10px;font-size:11px;font-weight:500;border:none;border-radius:4px;cursor:pointer;transition:all .2s;background:transparent;color:var(--text2);font-family:'Noto Sans KR',sans-serif;white-space:nowrap;}
 .tab-btn.active{background:var(--bg4);color:var(--text);}
 
 /* MAIN */
@@ -183,8 +183,8 @@ tr:hover td{background:rgba(255,255,255,.015);}
 .ana-3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
 @media(max-width:900px){.ana-3col{grid-template-columns:1fr;}}
 
-.ana-nav{display:flex;gap:2px;background:var(--bg3);border-radius:var(--rs);padding:3px;width:100%;margin-bottom:18px;flex-wrap:wrap;}
-.ana-tab{padding:6px 14px;font-size:12px;font-weight:500;border:none;border-radius:4px;cursor:pointer;background:transparent;color:var(--text2);font-family:'Noto Sans KR',sans-serif;transition:all .2s;white-space:nowrap;}
+.ana-nav{display:flex;gap:2px;background:var(--bg3);border-radius:var(--rs);padding:3px;width:100%;margin-bottom:18px;flex-wrap:nowrap;overflow-x:auto;}
+.ana-tab{padding:5px 10px;font-size:11px;font-weight:500;border:none;border-radius:4px;cursor:pointer;background:transparent;color:var(--text2);font-family:'Noto Sans KR',sans-serif;transition:all .2s;white-space:nowrap;}
 .ana-tab.active{background:var(--bg4);color:var(--text);}
 .ana-section{display:none;}.ana-section.active{display:block;}
 .ana-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
