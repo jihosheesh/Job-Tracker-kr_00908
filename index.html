@@ -54,7 +54,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .stat-val{font-size:24px;font-weight:700;font-family:'DM Mono',monospace;}
 
 /* ADD BAR */
-.add-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.add-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:16px;display:flex;gap:8px;align-items:center;flex-wrap:nowrap;overflow-x:auto;}
 .add-bar label{font-size:11px;color:var(--text3);white-space:nowrap;}
 .inp{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:7px 11px;color:var(--text);font-size:13px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color .2s;}
 .inp:focus{border-color:var(--accent);}
@@ -183,8 +183,8 @@ tr:hover td{background:rgba(255,255,255,.015);}
 .ana-3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
 @media(max-width:900px){.ana-3col{grid-template-columns:1fr;}}
 
-.ana-nav{display:flex;gap:2px;background:var(--bg3);border-radius:var(--rs);padding:3px;width:fit-content;margin-bottom:18px;}
-.ana-tab{padding:6px 18px;font-size:13px;font-weight:500;border:none;border-radius:4px;cursor:pointer;background:transparent;color:var(--text2);font-family:'Noto Sans KR',sans-serif;transition:all .2s;}
+.ana-nav{display:flex;gap:2px;background:var(--bg3);border-radius:var(--rs);padding:3px;width:100%;margin-bottom:18px;flex-wrap:wrap;}
+.ana-tab{padding:6px 14px;font-size:12px;font-weight:500;border:none;border-radius:4px;cursor:pointer;background:transparent;color:var(--text2);font-family:'Noto Sans KR',sans-serif;transition:all .2s;white-space:nowrap;}
 .ana-tab.active{background:var(--bg4);color:var(--text);}
 .ana-section{display:none;}.ana-section.active{display:block;}
 .ana-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
@@ -213,6 +213,29 @@ tr:hover td{background:rgba(255,255,255,.015);}
 
 .dark-toggle{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:5px 12px;cursor:pointer;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap;}
 .dark-toggle:hover{border-color:var(--accent);color:var(--accent);}
+
+
+/* TIMELINE */
+.login-screen{overflow-y:auto;}
+.login-wrap{display:flex;align-items:flex-start;justify-content:center;gap:32px;padding:40px 20px;min-height:100%;width:100%;}
+.timeline-panel{width:340px;flex-shrink:0;}
+.timeline-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px;display:flex;align-items:center;gap:6px;}
+.tl-item{display:flex;gap:12px;margin-bottom:0;}
+.tl-line{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.tl-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px;}
+.tl-dot.green{background:var(--green);}
+.tl-dot.amber{background:var(--amber);}
+.tl-dot.purple{background:var(--purple);}
+.tl-dot.teal{background:var(--teal);}
+.tl-connector{width:2px;background:var(--border2);flex:1;margin:4px 0;min-height:12px;}
+.tl-content{padding-bottom:18px;flex:1;}
+.tl-date{font-size:10px;color:var(--text3);margin-bottom:3px;letter-spacing:.4px;}
+.tl-heading{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;line-height:1.4;}
+.tl-heading strong{color:var(--accent);font-weight:700;}
+.tl-body{font-size:11px;color:var(--text2);line-height:1.65;}
+.tl-body strong{color:var(--text);font-weight:600;}
+.tl-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;}
+.tl-tag{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500;}
 
 /* LOGIN */
 .login-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;}
@@ -280,32 +303,133 @@ tr:hover td{background:rgba(255,255,255,.015);}
 
 <!-- ══ LOGIN SCREEN ══ -->
 <div class="login-screen" id="login-screen">
-  <div class="login-box">
-    <div class="login-logo">
-      <div class="login-logo-dot"></div>
-      <span class="login-logo-text">취업 파이프라인 트래커</span>
-    </div>
-    <div class="login-title">내 취업 파이프라인 시작하기</div>
-    <div class="login-desc">이름과 전화번호 뒷 4자리를 입력하면<br>나만의 취업 파이프라인이 만들어집니다.</div>
+  <div class="login-wrap">
 
-    <div class="login-field">
-      <label>이름</label>
-      <input class="login-inp" id="login-name" placeholder="예: 홍길동" maxlength="10"
-        onkeydown="if(event.key==='Enter')document.getElementById('login-phone').focus()">
-    </div>
-    <div class="login-field">
-      <label>전화번호 뒷 4자리</label>
-      <input class="login-inp" id="login-phone" placeholder="예: 1234" maxlength="4"
-        type="tel" inputmode="numeric"
-        onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <button class="login-btn" onclick="doLogin()">입장하기 →</button>
-    <div class="login-error" id="login-error"></div>
+    <!-- 로그인 박스 -->
+    <div class="login-box" style="flex-shrink:0">
+      <div class="login-logo">
+        <div class="login-logo-dot"></div>
+        <span class="login-logo-text">취업 파이프라인 트래커</span>
+      </div>
+      <div class="login-title">내 취업 파이프라인 시작하기</div>
+      <div class="login-desc">이름과 전화번호 뒷 4자리를 입력하면<br>나만의 취업 파이프라인이 만들어집니다.</div>
 
-    <hr class="login-divider">
-    <div class="login-note">
-      ⚠ 이름 + 전화번호 뒷자리는 비밀번호 역할을 합니다.<br>
-      타인에게 공유하지 마세요.
+      <div class="login-field">
+        <label>이름</label>
+        <input class="login-inp" id="login-name" placeholder="예: 홍길동" maxlength="10"
+          onkeydown="if(event.key==='Enter')document.getElementById('login-phone').focus()">
+      </div>
+      <div class="login-field">
+        <label>전화번호 뒷 4자리</label>
+        <input class="login-inp" id="login-phone" placeholder="예: 1234" maxlength="4"
+          type="tel" inputmode="numeric"
+          onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="login-btn" onclick="doLogin()">입장하기 →</button>
+      <div class="login-error" id="login-error"></div>
+
+      <hr class="login-divider">
+      <div class="login-note">
+        ⚠ 이름 + 전화번호 뒷자리는 비밀번호 역할을 합니다.<br>
+        타인에게 공유하지 마세요.
+      </div>
+    </div>
+
+    <!-- 업데이트 타임라인 -->
+    <div class="timeline-panel">
+      <div class="timeline-title">🔔 업데이트 내역</div>
+
+      <!-- v1.4 -->
+      <div class="tl-item">
+        <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+        <div class="tl-content">
+          <div class="tl-date">2025.03 · v1.4</div>
+          <div class="tl-heading">자소서 분석 대폭 강화</div>
+          <div class="tl-body">
+            <strong>📋 채용공고 분석</strong> 새로 추가 — 이미지 업로드 시 직무 상세·필요역량 자동 정리<br>
+            <strong>💡 지원동기 작성기</strong> 추가 — 기사 스크랩 + 내 경험 입력 → 지원동기 예시 자동 생성<br>
+            <strong>✅ 합격 자소서 분석 / ❌ 불합격 자소서 분석</strong> 탭 분리<br>
+            분석 기준에 <strong>3C4P 프레임워크</strong> 적용
+          </div>
+          <div class="tl-tags">
+            <span class="tl-tag" style="background:rgba(79,127,255,.12);color:var(--accent)">채용공고 분석</span>
+            <span class="tl-tag" style="background:rgba(167,139,250,.15);color:var(--purple)">지원동기 작성기</span>
+            <span class="tl-tag" style="background:rgba(62,207,142,.1);color:var(--green)">3C4P</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- v1.3 -->
+      <div class="tl-item">
+        <div class="tl-line"><div class="tl-dot teal"></div><div class="tl-connector"></div></div>
+        <div class="tl-content">
+          <div class="tl-date">2025.03 · v1.3</div>
+          <div class="tl-heading">채용달력 & 마감일 추가</div>
+          <div class="tl-body">
+            <strong>📅 채용달력</strong> 탭 신설 — 기업별 마감일을 달력에서 한눈에 확인<br>
+            기업 추가 시 <strong>마감일 입력</strong> 가능, D-Day 뱃지 자동 표시<br>
+            라이트모드 기본 적용 + 🌙 다크모드 토글 추가
+          </div>
+          <div class="tl-tags">
+            <span class="tl-tag" style="background:var(--teal-bg);color:var(--teal)">채용달력</span>
+            <span class="tl-tag" style="background:var(--amber-bg);color:var(--amber)">D-Day 알림</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- v1.2 -->
+      <div class="tl-item">
+        <div class="tl-line"><div class="tl-dot green"></div><div class="tl-connector"></div></div>
+        <div class="tl-content">
+          <div class="tl-date">2025.03 · v1.2</div>
+          <div class="tl-heading">통계 대시보드 & 그룹사 분석</div>
+          <div class="tl-body">
+            보드 탭에 <strong>직군별 분석</strong> 추가 — 영업·개발·마케팅 등 10개 직군 자동 분류<br>
+            <strong>그룹사 현황</strong> — 삼성·LG·SK 등 25개 그룹 자동 인식·계열사 묶기<br>
+            전형 단계별 <strong>합격률 퍼널</strong> 시각화
+          </div>
+          <div class="tl-tags">
+            <span class="tl-tag" style="background:rgba(62,207,142,.1);color:var(--green)">직군 분석</span>
+            <span class="tl-tag" style="background:rgba(245,166,35,.12);color:var(--amber)">그룹사 현황</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- v1.1 -->
+      <div class="tl-item">
+        <div class="tl-line"><div class="tl-dot amber"></div><div class="tl-connector"></div></div>
+        <div class="tl-content">
+          <div class="tl-date">2025.03 · v1.1</div>
+          <div class="tl-heading">멀티유저 & 단계 잠금</div>
+          <div class="tl-body">
+            이름+전화번호로 <strong>개인별 독립 데이터</strong> 저장 (Supabase 연동)<br>
+            서류→1차→2차→합격 <strong>단계 전제조건 잠금</strong> — 이전 단계 완료 전 다음 단계 차단<br>
+            산업군·직무·직무상세 입력란 추가
+          </div>
+          <div class="tl-tags">
+            <span class="tl-tag" style="background:rgba(79,127,255,.12);color:var(--accent)">멀티유저</span>
+            <span class="tl-tag" style="background:var(--red-bg);color:var(--red)">단계 잠금</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- v1.0 -->
+      <div class="tl-item">
+        <div class="tl-line"><div class="tl-dot purple"></div></div>
+        <div class="tl-content">
+          <div class="tl-date">2025.03 · v1.0</div>
+          <div class="tl-heading">최초 출시</div>
+          <div class="tl-body">
+            파이프라인 트래커 기본 기능 — 기업 추가·단계 체크·메모<br>
+            <strong>자소서 AI 분석</strong> (STAR 구조 기반) 탑재<br>
+            파이프라인 보드 뷰 제공
+          </div>
+          <div class="tl-tags">
+            <span class="tl-tag" style="background:var(--purple-bg);color:var(--purple)">첫 출시</span>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -346,7 +470,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <label>직무</label>
     <input class="inp" id="inp-job" placeholder="직무명" style="width:120px">
     <label>마감일</label>
-    <input class="inp" id="inp-deadline" type="date" style="width:140px">
+    <input class="inp" id="inp-deadline" type="text" placeholder="년-월-일 (예: 2025-03-31)" style="width:180px" maxlength="10" oninput="formatDateInput(this)">
     <button class="btn" onclick="addCompany()">+ 추가</button>
   </div>
 
@@ -671,7 +795,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
     </div>
     <div class="form-group">
       <label class="form-label">마감일</label>
-      <input class="inp form-inp" id="edit-deadline" type="date">
+      <input class="inp form-inp" id="edit-deadline" type="text" placeholder="년-월-일 (예: 2025-03-31)" maxlength="10" oninput="formatDateInput(this)">
     </div>
     <div class="form-group">
       <label class="form-label">직무 상세 / 담당 업무</label>
@@ -885,7 +1009,7 @@ function renderTable(){
         const tip=done?STEP_LABELS[i]+' 완료':(can?STEP_LABELS[i]:'이전 단계 완료 필요');
         return `<td style="text-align:center"><button class="${cls}" data-tip="${tip}" onclick="toggleStep(${c.id},${i})">${txt}</button></td>`;
       }).join('')}
-      <td style="text-align:center">${c.deadline?`<span style='font-size:11px;color:var(--text2)'>${c.deadline.replace(/-/g,'.')+''}</span>${deadlineBadge(c.deadline)}`:'<span style="color:var(--text3);font-size:11px">—</span>'}</td>
+      <td style="text-align:center">${c.deadline?`<span style='font-size:11px;color:var(--text2)'>${c.deadline}</span>${deadlineBadge(c.deadline)}`:'<span style="color:var(--text3);font-size:11px">—</span>'}</td>
       <td><input class="memo-inp" value="${esc(c.memo)}" placeholder="메모..." onchange="updateMemo(${c.id},this.value)"></td>
       <td>
         <button class="action-btn edit" onclick="openEdit(${c.id})" title="수정">✏</button>
@@ -1694,6 +1818,15 @@ ${textInput}
     box.textContent = '오류: ' + e.message;
   }
   btn.disabled = false;
+}
+
+
+function formatDateInput(el){
+  let v = el.value.replace(/[^0-9]/g,'');
+  if(v.length > 4) v = v.slice(0,4) + '-' + v.slice(4);
+  if(v.length > 7) v = v.slice(0,7) + '-' + v.slice(7);
+  if(v.length > 10) v = v.slice(0,10);
+  el.value = v;
 }
 
 // ── SETTINGS ──────────────────────────────────────────
