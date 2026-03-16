@@ -589,8 +589,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <div class="ana-nav">
     <button class="ana-tab active" onclick="switchAna('single',this)">📝 제출 전 분석</button>
     <button class="ana-tab" onclick="switchAna('compare',this)">🔍 비교 분석</button>
-    <button class="ana-tab" onclick="switchAna('passcheck',this)">✅ 합격 자소서 분석</button>
-    <button class="ana-tab" onclick="switchAna('failcheck',this)">❌ 불합격 자소서 분석</button>
+    <button class="ana-tab" onclick="switchAna('passcheck',this)">✅❌ 합격/불합격 분석</button>
     <button class="ana-tab" onclick="switchAna('motive',this)">💡 지원동기 작성기</button>
     <button class="ana-tab" onclick="switchAna('jobpost',this)">📋 채용공고 분석</button>
   </div>
@@ -680,33 +679,29 @@ tr:hover td{background:rgba(255,255,255,.015);}
   <!-- 합격 자소서 분석 -->
   <div class="ana-section" id="ana-passcheck">
     <div class="guide-card" style="margin-bottom:16px">
-      <h4>✅ 합격 자소서 분석 — 왜 합격했는가?</h4>
-      <p>합격한 자소서의 강점 패턴을 분석해 내 자소서에 적용할 인사이트를 도출합니다.</p>
+      <h4>✅❌ 합격 / 불합격 자소서 분석</h4>
+      <p>합격 자소서는 왜 합격했는지, 불합격 자소서는 왜 떨어졌는지 3C4P·STAR 기준으로 분석합니다.</p>
     </div>
-    <div class="ana-row">
-      <label>기업</label>
+
+    <!-- 합격/불합격 선택 -->
+    <div style="display:flex;gap:16px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+      <div style="display:flex;gap:12px">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-weight:500">
+          <input type="radio" name="pf-result" value="pass" id="pf-pass" checked onchange="updatePFLabel()">
+          <span style="color:var(--green)">✅ 합격 자소서</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-weight:500">
+          <input type="radio" name="pf-result" value="fail" id="pf-fail" onchange="updatePFLabel()">
+          <span style="color:var(--red)">❌ 불합격 자소서</span>
+        </label>
+      </div>
       <select class="sel" id="ana-pass-company" style="min-width:130px"></select>
     </div>
+
     <div id="qa-list-pass"></div>
     <button class="btn-add-qa" onclick="addQA('pass')">+ 문항 추가</button>
-    <button class="btn" id="btn-pass" onclick="runPassAnalysis()">합격 분석 시작</button>
+    <button class="btn" id="btn-pass" onclick="runPassFailAnalysis()">🔍 분석 시작</button>
     <div class="result-box" id="result-pass"></div>
-  </div>
-
-  <!-- 불합격 자소서 분석 -->
-  <div class="ana-section" id="ana-failcheck">
-    <div class="guide-card" style="margin-bottom:16px">
-      <h4>❌ 불합격 자소서 분석 — 왜 떨어졌는가?</h4>
-      <p>불합격한 자소서의 문제점을 3C4P·STAR 기준으로 진단하고 구체적 개선안을 제시합니다.</p>
-    </div>
-    <div class="ana-row">
-      <label>기업</label>
-      <select class="sel" id="ana-fail-company" style="min-width:130px"></select>
-    </div>
-    <div id="qa-list-fail"></div>
-    <button class="btn-add-qa" onclick="addQA('fail')">+ 문항 추가</button>
-    <button class="btn" id="btn-fail" onclick="runFailAnalysis()">불합격 원인 분석</button>
-    <div class="result-box" id="result-fail"></div>
   </div>
 
   <!-- 지원동기 작성기 -->
@@ -1168,7 +1163,7 @@ function switchAna(tab,btn){
   document.getElementById('ana-'+tab).classList.add('active');
   btn.classList.add('active');
   // 기업 선택 드롭다운 동기화
-  const maps={'passcheck':'ana-pass-company','failcheck':'ana-fail-company','motive':'ana-motive-company'};
+  const maps={'passcheck':'ana-pass-company','motive':'ana-motive-company'};
   if(maps[tab]) syncAnaCompany(maps[tab]);
 }
 function syncAnaCompany(selId){
@@ -1659,7 +1654,7 @@ function toggleGroup(id){
 
 // ── ANALYSIS ──────────────────────────────────────────
 function renderAnaSelect(){
-  ['ana-company','ana-pass-company','ana-fail-company','ana-motive-company'].forEach(id=>{
+  ['ana-company','ana-pass-company','ana-motive-company'].forEach(id=>{
     const sel=document.getElementById(id);
     if(!sel) return;
     sel.innerHTML='<option value="">기업 선택 (선택사항)</option>'+
@@ -2209,7 +2204,7 @@ function getQAItems(type){
 
 // 초기 문항 1개 자동 추가
 function initQA(){
-  ['single','pass','fail'].forEach(type => {
+  ['single','pass'].forEach(type => {
     const list = document.getElementById('qa-list-'+type);
     if(list && list.children.length === 0) addQA(type);
   });
@@ -2406,6 +2401,63 @@ function getJDContext(){
   if(reqs)      ctx += `\n\n필수역량/자격요건:\n${reqs}`;
   if(preferred) ctx += `\n\n우대사항(경험/역량 위주, 자격증·어학점수 제외):\n${preferred}`;
   return ctx;
+}
+
+
+function updatePFLabel(){
+  const isPass = document.querySelector('input[name="pf-result"]:checked').value === 'pass';
+  document.getElementById('btn-pass').textContent = isPass ? '✅ 합격 분석 시작' : '❌ 불합격 원인 분석';
+}
+
+async function runPassFailAnalysis(){
+  const isPass = document.querySelector('input[name="pf-result"]:checked').value === 'pass';
+  const text = getQAText('pass');
+  if(!text){ alert('자소서 내용을 입력해주세요.'); return; }
+  const cName = document.getElementById('ana-pass-company').value;
+  const c = companies.find(x=>x.name===cName);
+  const job = c?.job||'', industry = c?.industry||'';
+  const meta = [cName?`지원 기업: ${cName}`:'', industry?`기업규모: ${industry}`:'', job?`지원 직무: ${job}`:''].filter(Boolean).join('\n');
+
+  const box = document.getElementById('result-pass');
+  const btn = document.getElementById('btn-pass');
+  btn.disabled = true;
+  box.className = 'result-box show';
+  box.textContent = isPass ? '✅ 합격 요인 분석 중... ⏳' : '❌ 불합격 원인 분석 중... ⏳';
+
+  const prompt = isPass
+    ? `당신은 채용 전문가입니다.
+${meta}
+
+---합격 자소서---
+${text}
+---
+
+[합격 요인 분석]
+1. STAR+3단구성 강점 — 잘 된 부분 3가지 (본문 인용)
+2. 합격을 이끈 핵심 문장 2개 인용 및 이유
+3. 내 자소서에 바로 적용할 수 있는 패턴 2가지
+
+번호와 소제목으로 구분, 서술형으로 간결하게.`
+    : `당신은 채용 전문가입니다.
+${meta}
+
+---불합격 자소서---
+${text}
+---
+
+[불합격 원인 진단]
+1. 핵심 약점 3가지 — STAR+3C4P 기준 (본문 인용)
+2. 문제 문장 2개 인용 → 개선문 예시 제공
+3. 가장 시급히 고쳐야 할 것 1가지
+
+번호와 소제목으로 구분, 서술형으로 간결하게.`;
+
+  try {
+    box.textContent = await callClaude(prompt);
+  } catch(e) {
+    box.textContent = '오류: ' + e.message;
+  }
+  btn.disabled = false;
 }
 
 // ── FEEDBACK ──────────────────────────────────────────
