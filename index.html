@@ -169,6 +169,20 @@ tr:hover td{background:rgba(255,255,255,.015);}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
 
 /* ANALYSIS */
+
+/* ANALYSIS GUIDE */
+.guide-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:12px;}
+.guide-card h4{font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text);}
+.guide-card p{font-size:12px;color:var(--text2);line-height:1.75;margin-bottom:4px;}
+.guide-tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;margin-right:4px;margin-bottom:4px;}
+.tag-blue{background:rgba(79,127,255,.12);color:var(--accent);}
+.tag-green{background:var(--green-bg);color:var(--green);}
+.tag-amber{background:var(--amber-bg);color:var(--amber);}
+.tag-red{background:var(--red-bg);color:var(--red);}
+.tag-purple{background:var(--purple-bg);color:var(--purple);}
+.ana-3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
+@media(max-width:900px){.ana-3col{grid-template-columns:1fr;}}
+
 .ana-nav{display:flex;gap:2px;background:var(--bg3);border-radius:var(--rs);padding:3px;width:fit-content;margin-bottom:18px;}
 .ana-tab{padding:6px 18px;font-size:13px;font-weight:500;border:none;border-radius:4px;cursor:pointer;background:transparent;color:var(--text2);font-family:'Noto Sans KR',sans-serif;transition:all .2s;}
 .ana-tab.active{background:var(--bg4);color:var(--text);}
@@ -304,7 +318,7 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <button class="tab-btn active" onclick="switchTab('tracker',this)">파이프라인</button>
     <button class="tab-btn" onclick="switchTab('calendar',this)">채용달력</button>
     <button class="tab-btn" onclick="switchTab('board',this)">보드</button>
-    <button class="tab-btn" onclick="switchTab('analysis',this)">자소서 분석</button>
+    <button class="tab-btn" onclick="switchTab('analysis',this)">자소서 분석 및 가이드</button>
     <button class="tab-btn" onclick="switchTab('settings',this)">설정</button>
   </div>
 </header>
@@ -415,50 +429,176 @@ tr:hover td{background:rgba(255,255,255,.015);}
 
 <!-- ══ ANALYSIS ══ -->
 <div class="section" id="tab-analysis">
-  <p class="section-title">자소서 AI 분석</p>
-  <p class="section-desc">STAR 구조·HR 관점·합격 자소서 벤치마크 기준으로 심층 분석합니다. API 키는 설정 탭에서 입력하세요.</p>
+  <p class="section-title">자소서 분석 및 가이드</p>
+  <p class="section-desc">STAR·3C4P·HR 관점 기준으로 자소서를 분석하고, 지원동기 작성까지 도와드립니다.</p>
 
   <div class="ana-nav">
-    <button class="ana-tab active" onclick="switchAna('single',this)">단일 분석</button>
-    <button class="ana-tab" onclick="switchAna('compare',this)">비교 분석</button>
+    <button class="ana-tab active" onclick="switchAna('single',this)">📝 제출 전 분석</button>
+    <button class="ana-tab" onclick="switchAna('compare',this)">🔍 비교 분석</button>
+    <button class="ana-tab" onclick="switchAna('passcheck',this)">✅ 합격 자소서 분석</button>
+    <button class="ana-tab" onclick="switchAna('failcheck',this)">❌ 불합격 자소서 분석</button>
+    <button class="ana-tab" onclick="switchAna('motive',this)">💡 지원동기 작성기</button>
+    <button class="ana-tab" onclick="switchAna('jobpost',this)">📋 채용공고 분석</button>
   </div>
 
-  <!-- 단일 -->
+  <!-- 제출 전 단일 분석 -->
   <div class="ana-section active" id="ana-single">
+    <div class="guide-card" style="margin-bottom:16px">
+      <h4>📌 제출 전 자소서 점검</h4>
+      <p>제출하기 전 자소서를 AI가 3단 구성·STAR·3C4P·HR 관점으로 분석해 개선점을 찾아드립니다.</p>
+    </div>
     <div class="ana-row">
       <label>기업</label>
       <select class="sel" id="ana-company" style="min-width:130px"></select>
-      <label>결과</label>
-      <label style="color:var(--text2);cursor:pointer">
-        <input type="radio" name="ana-result" value="pass" checked> ✅ 합격
-      </label>
-      <label style="color:var(--text2);cursor:pointer">
-        <input type="radio" name="ana-result" value="fail"> ❌ 불합격
-      </label>
     </div>
     <div class="form-group">
       <div class="col-label">자소서 본문</div>
-      <textarea class="inp form-textarea" id="ana1-text" rows="10" placeholder="자소서 본문을 여기에 붙여넣으세요..."></textarea>
+      <textarea class="inp form-textarea" id="ana1-text" rows="10" placeholder="제출 예정인 자소서 본문을 여기에 붙여넣으세요..."></textarea>
     </div>
-    <button class="btn" id="btn-ana1" onclick="runSingle()">분석 시작</button>
+    <button class="btn" id="btn-ana1" onclick="runSingle()">점검 시작</button>
     <div class="result-box" id="result1"></div>
   </div>
 
-  <!-- 비교 -->
+  <!-- 비교 분석 -->
   <div class="ana-section" id="ana-compare">
+    <div class="guide-card" style="margin-bottom:16px">
+      <h4>🔍 합격 자소서와 내 자소서 비교</h4>
+      <p>합격자 자소서와 내 자소서를 나란히 넣으면 결정적 차이를 분석해드립니다.</p>
+    </div>
     <div class="ana-2col">
       <div>
-        <div class="col-label">✅ 합격 자소서</div>
-        <textarea class="inp form-textarea" id="cmp-pass" rows="10" placeholder="합격한 자소서..."></textarea>
+        <div class="col-label">✅ 합격 자소서 (참고용)</div>
+        <textarea class="inp form-textarea" id="cmp-pass" rows="10" placeholder="잡코리아·캐치·링커리어 등에서 찾은 합격 자소서..."></textarea>
       </div>
       <div>
-        <div class="col-label">❌ 불합격 자소서</div>
-        <textarea class="inp form-textarea" id="cmp-fail" rows="10" placeholder="불합격한 자소서..."></textarea>
+        <div class="col-label">📝 내 자소서</div>
+        <textarea class="inp form-textarea" id="cmp-fail" rows="10" placeholder="내가 작성한 자소서..."></textarea>
       </div>
     </div>
     <button class="btn" id="btn-cmp" onclick="runCompare()">비교 분석 시작</button>
     <div class="result-box" id="result2"></div>
   </div>
+
+  <!-- 합격 자소서 분석 -->
+  <div class="ana-section" id="ana-passcheck">
+    <div class="guide-card" style="margin-bottom:16px">
+      <h4>✅ 합격 자소서 분석 — 왜 합격했는가?</h4>
+      <p>합격한 자소서의 강점 패턴을 분석해 내 자소서에 적용할 인사이트를 도출합니다.</p>
+    </div>
+    <div class="ana-row">
+      <label>기업</label>
+      <select class="sel" id="ana-pass-company" style="min-width:130px"></select>
+    </div>
+    <div class="form-group">
+      <div class="col-label">합격 자소서 본문</div>
+      <textarea class="inp form-textarea" id="ana-pass-text" rows="10" placeholder="합격한 자소서를 붙여넣으세요..."></textarea>
+    </div>
+    <button class="btn" id="btn-pass" onclick="runPassAnalysis()">합격 분석 시작</button>
+    <div class="result-box" id="result-pass"></div>
+  </div>
+
+  <!-- 불합격 자소서 분석 -->
+  <div class="ana-section" id="ana-failcheck">
+    <div class="guide-card" style="margin-bottom:16px">
+      <h4>❌ 불합격 자소서 분석 — 왜 떨어졌는가?</h4>
+      <p>불합격한 자소서의 문제점을 3C4P·STAR 기준으로 진단하고 구체적 개선안을 제시합니다.</p>
+    </div>
+    <div class="ana-row">
+      <label>기업</label>
+      <select class="sel" id="ana-fail-company" style="min-width:130px"></select>
+    </div>
+    <div class="form-group">
+      <div class="col-label">불합격 자소서 본문</div>
+      <textarea class="inp form-textarea" id="ana-fail-text" rows="10" placeholder="불합격한 자소서를 붙여넣으세요..."></textarea>
+    </div>
+    <button class="btn" id="btn-fail" onclick="runFailAnalysis()">불합격 원인 분석</button>
+    <div class="result-box" id="result-fail"></div>
+  </div>
+
+  <!-- 지원동기 작성기 -->
+  <div class="ana-section" id="ana-motive">
+    <div class="guide-card" style="margin-bottom:16px">
+      <h4>💡 지원동기 작성기</h4>
+      <p>관련 기사나 기업 정보를 스크랩하고 본인 경험을 입력하면, 설득력 있는 지원동기 예시를 만들어드립니다.</p>
+      <p style="margin-top:6px"><span class="guide-tag tag-blue">Why Us</span><span class="guide-tag tag-green">경험 연결</span><span class="guide-tag tag-amber">산업 인사이트</span><span class="guide-tag tag-purple">기여 방안</span></p>
+    </div>
+    <div class="ana-row" style="margin-bottom:12px">
+      <label>기업</label>
+      <select class="sel" id="ana-motive-company" style="min-width:130px"></select>
+    </div>
+    <div class="ana-2col">
+      <div>
+        <div class="col-label">📰 기사·뉴스 스크랩 또는 기업 정보</div>
+        <textarea class="inp form-textarea" id="motive-article" rows="8"
+          placeholder="예시) OO기업이 최근 AI 기반 맞춤형 추천 시스템을 도입하며 업계 혁신을 주도하고 있다. 해당 기술로 전환율이 35% 상승했으며, 2025년까지 글로벌 확장을 목표로 하고 있다..."></textarea>
+      </div>
+      <div>
+        <div class="col-label">🙋 나의 관련 경험</div>
+        <textarea class="inp form-textarea" id="motive-experience" rows="8"
+          placeholder="예시) 대학 시절 데이터 분석 프로젝트에서 개인화 추천 알고리즘을 연구했습니다. A/B 테스트로 클릭률을 30% 향상시킨 경험이 있고, Python으로 머신러닝 모델을 구현했습니다..."></textarea>
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:12px">
+      <div class="col-label">🎯 지원 직무 및 포부 (선택)</div>
+      <input class="inp" id="motive-job" placeholder="예: 데이터 마케팅 담당자로서 고객 경험 개선에 기여하고 싶습니다" style="width:100%">
+    </div>
+    <button class="btn" id="btn-motive" onclick="runMotiveGenerator()">지원동기 예시 생성</button>
+    <div class="result-box" id="result-motive"></div>
+  
+  <!-- 채용공고 분석 -->
+  <div class="ana-section" id="ana-jobpost">
+    <div class="guide-card" style="margin-bottom:16px">
+      <h4>📋 채용공고 분석 — 직무 상세 & 필요역량 정리</h4>
+      <p>채용공고 캡처 이미지를 올리고 원하는 직무를 입력하면 AI가 담당업무와 필요역량을 체계적으로 정리해드립니다.</p>
+      <p style="margin-top:6px"><span class="guide-tag tag-blue">담당업무 정리</span><span class="guide-tag tag-green">필요역량 분석</span><span class="guide-tag tag-amber">자소서 키워드 추출</span></p>
+    </div>
+
+    <!-- 직무 입력 3개 -->
+    <div style="margin-bottom:14px">
+      <div class="col-label" style="margin-bottom:8px">🎯 분석할 직무 (최대 3개)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">직무 1</div>
+          <input class="inp" id="jp-job1" placeholder="예: 해외영업" style="width:100%">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">직무 2 (선택)</div>
+          <input class="inp" id="jp-job2" placeholder="예: B2B 영업" style="width:100%">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">직무 3 (선택)</div>
+          <input class="inp" id="jp-job3" placeholder="예: 영업관리" style="width:100%">
+        </div>
+      </div>
+    </div>
+
+    <!-- 이미지 업로드 -->
+    <div style="margin-bottom:14px">
+      <div class="col-label" style="margin-bottom:8px">📸 채용공고 이미지 업로드</div>
+      <div id="jp-drop-zone" onclick="document.getElementById('jp-file').click()"
+        style="border:2px dashed var(--border2);border-radius:var(--r);padding:32px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3)">
+        <div style="font-size:28px;margin-bottom:8px">📷</div>
+        <div style="font-size:13px;color:var(--text2)">클릭하거나 이미지를 드래그해서 올려주세요</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">JPG, PNG, WEBP 지원</div>
+      </div>
+      <input type="file" id="jp-file" accept="image/*" style="display:none" onchange="handleJobPostImage(this)">
+      <div id="jp-preview-wrap" style="display:none;margin-top:10px">
+        <img id="jp-preview" style="max-width:100%;max-height:400px;border-radius:var(--rs);border:1px solid var(--border2)">
+        <button onclick="clearJobPostImage()" style="display:block;margin-top:6px;background:none;border:none;color:var(--red);cursor:pointer;font-size:12px">✕ 이미지 제거</button>
+      </div>
+    </div>
+
+    <!-- 직접 텍스트 입력 (선택) -->
+    <div style="margin-bottom:14px">
+      <div class="col-label" style="margin-bottom:4px">📝 또는 채용공고 텍스트 직접 입력 (이미지 없을 때)</div>
+      <textarea class="inp form-textarea" id="jp-text" rows="6"
+        placeholder="채용공고 내용을 복사해서 붙여넣으세요...&#10;(이미지를 올렸다면 비워두셔도 됩니다)"></textarea>
+    </div>
+
+    <button class="btn" id="btn-jp" onclick="runJobPostAnalysis()">📋 직무 분석 시작</button>
+    <div class="result-box" id="result-jp"></div>
+  </div>
+
 </div>
 
 <!-- ══ SETTINGS ══ -->
@@ -699,6 +839,17 @@ function switchAna(tab,btn){
   document.querySelectorAll('.ana-tab').forEach(b=>b.classList.remove('active'));
   document.getElementById('ana-'+tab).classList.add('active');
   btn.classList.add('active');
+  // 기업 선택 드롭다운 동기화
+  const maps={'passcheck':'ana-pass-company','failcheck':'ana-fail-company','motive':'ana-motive-company'};
+  if(maps[tab]) syncAnaCompany(maps[tab]);
+}
+function syncAnaCompany(selId){
+  const sel=document.getElementById(selId);
+  if(!sel) return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">기업 선택 (선택사항)</option>'+
+    companies.map(c=>`<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
+  if(cur) sel.value=cur;
 }
 
 // ── STATS ─────────────────────────────────────────────
@@ -1169,21 +1320,47 @@ function toggleGroup(id){
 
 // ── ANALYSIS ──────────────────────────────────────────
 function renderAnaSelect(){
-  const sel=document.getElementById('ana-company');
-  sel.innerHTML='<option value="">기업 선택 (선택사항)</option>'+
-    companies.map(c=>`<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
+  ['ana-company','ana-pass-company','ana-fail-company','ana-motive-company'].forEach(id=>{
+    const sel=document.getElementById(id);
+    if(!sel) return;
+    sel.innerHTML='<option value="">기업 선택 (선택사항)</option>'+
+      companies.map(c=>`<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
+  });
 }
 
 const ANA_FRAMEWORK=`
-[자기소개서 평가 기준]
+[자기소개서 평가 기준 — 아래 모든 기준을 반드시 적용]
+
 1. 3단 구성 충족 여부
    ① 요약 한 줄: HR이 한눈에 파악할 핵심 1줄 존재 여부
    ② STAR 구조: 사건(1개)→문제→행동→배운점/역량 자연스러운 전개
    ③ 지원사 기여 방식: '어떤 역량을 어떤 방식으로' 실제 업무 기준 구체적 서술
-2. HR 관점 작성 규칙
+
+2. 3C4P 경험 어필 구조 분석
+   [3C — 그 경험을 왜 했어?]
+   - Customer(고객): 혜택받는 대상과 그 니즈가 명확한지
+   - Company(자사): 당시 나의 상황과 역할이 구체적인지
+   - Competitor(경쟁사): 벤치마킹·조사·비교가 있는지
+   [4P — 그 경험을 어떻게 했어?]
+   - Product(결과물): 경험의 결과와 의미가 수치로 표현됐는지
+   - Place(문제해결점): 핵심 문제 발견과 해결 과정이 있는지
+   - Price(생산성): 효율을 높인 구체적 행동이 있는지
+   - Promotion(소통): 협업·문서화·설명 등 커뮤니케이션이 있는지
+   ※ 수치화 필수: '얼마나?'라는 질문에 답할 수 있어야 함
+
+3. 지원동기 4가지 원칙 점검
+   ① 회사·직무 사전 조사 기반 (팩트 나열 X, 인사이트 O)
+   ② 나와 기업의 연결고리 (내 경험 → 기업 방향성 연결)
+   ③ 직무 적합성 강조 (경험 나열 X, 역량 연결 O)
+   ④ Why Us — 이 회사여야 하는 이유 (구체적 근거)
+
+4. HR 관점 작성 규칙
    - 근거→결론 구조, 추상적·감정적 문장 최소화
    - 실무 가치(안전·품질·정확성·재발방지·협업·관찰력) 반영
-3. 합격 자소서 벤치마크: 잡코리아·자소설닷컴·캐치·링커리어 합격 자소서와 비교`;
+   - 수식어 대신 수치·결과물로 대체
+
+5. 합격 자소서 벤치마크: 잡코리아·자소설닷컴·캐치·링커리어 합격 자소서와 비교
+`;
 
 async function callClaude(prompt){
   // Supabase Edge Function을 통해 Claude API 호출 (API 키 불필요)
@@ -1192,7 +1369,6 @@ async function callClaude(prompt){
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
     },
     body: JSON.stringify({ prompt, max_tokens: 1500 })
   });
@@ -1208,30 +1384,316 @@ async function callClaude(prompt){
 async function runSingle(){
   const text=document.getElementById('ana1-text').value.trim();
   if(!text){alert('자소서 내용을 입력해주세요.');return;}
-  const result=document.querySelector('input[name="ana-result"]:checked').value;
   const cName=document.getElementById('ana-company').value;
   const c=companies.find(x=>x.name===cName);
   const job=c?.job||'',industry=c?.industry||'';
-  const rLabel=result==='pass'?'합격':'불합격';
   const meta=[cName?`지원 기업: ${cName}`:'',industry?`산업군: ${industry}`:'',job?`지원 직무: ${job}`:''].filter(Boolean).join('\n');
-  const tasks=result==='pass'?
-    `1. 합격 요인 3가지 — 3단구성·STAR·HR관점 기준\n2. 잘 활용된 표현·구조\n3. 다른 자소서에 재활용하는 방법`:
-    `1. 불합격 추정 원인 3가지\n2. 합격 자소서와의 결정적 차이\n3. 구체적 수정 제안 2~3가지`;
-  const prompt=`당신은 10년 경력 채용 전문가이자 자기소개서 분석가입니다.\n${meta}\n분석 유형: ${rLabel} 자소서\n\n${ANA_FRAMEWORK}\n\n---자소서---\n${text}\n---\n\n[분석 결과]\n${tasks}\n\n각 항목은 번호와 소제목으로 구분하고 서술형으로 작성하세요.`;
+  const prompt=`당신은 10년 경력 채용 전문가이자 자기소개서 분석가입니다.
+${meta}
+분석 유형: 제출 전 자소서 점검
+
+${ANA_FRAMEWORK}
+
+---자소서---
+${text}
+---
+
+[점검 결과]
+1. 3단 구성 완성도 — ①요약한줄 ②STAR구조 ③기여방식 각각 평가
+2. 3C4P 분석 — Customer/Company/Competitor/Product/Place/Price/Promotion 항목별 충족 여부
+3. 핵심 강점 2가지 (본문 문장 인용)
+4. 개선 필요 사항 2~3가지 (구체적 수정 예시 포함)
+5. 종합 점수 (100점 만점, 항목별 점수 포함)
+
+각 항목은 번호와 소제목으로 구분하고 서술형으로 작성하세요.`;
   const box=document.getElementById('result1'),btn=document.getElementById('btn-ana1');
-  btn.disabled=true;box.className='result-box show';box.innerHTML='<span class="loading">분석 중... ⏳</span>';
+  btn.disabled=true;box.className='result-box show';box.innerHTML='<span class="loading">점검 중... ⏳</span>';
   try{box.textContent=await callClaude(prompt);}catch(e){box.textContent='오류: '+e.message;}
   btn.disabled=false;
 }
 
 async function runCompare(){
   const p=document.getElementById('cmp-pass').value.trim(),f=document.getElementById('cmp-fail').value.trim();
-  if(!p||!f){alert('합격/불합격 자소서를 모두 입력해주세요.');return;}
-  const prompt=`당신은 10년 경력 채용 전문가이자 자기소개서 분석가입니다.\n\n${ANA_FRAMEWORK}\n\n=== 합격 자소서 ===\n${p}\n\n=== 불합격 자소서 ===\n${f}\n\n[비교 분석 결과]\n1. 합격 자소서의 핵심 강점 3가지\n2. 불합격 자소서의 핵심 약점 3가지\n3. 결정적 차이점 요약\n4. 불합격 자소서 구체적 개선 제안 2~3가지\n\n각 항목은 번호와 소제목으로 구분하고 서술형으로 작성하세요.`;
+  if(!p||!f){alert('두 자소서를 모두 입력해주세요.');return;}
+  const prompt=`당신은 10년 경력 채용 전문가이자 자기소개서 분석가입니다.
+
+${ANA_FRAMEWORK}
+
+=== 합격 자소서 (참고용) ===
+${p}
+
+=== 내 자소서 ===
+${f}
+
+[비교 분석 결과]
+1. 합격 자소서의 핵심 강점 3가지 — 3C4P·STAR 기준, 본문 인용
+2. 내 자소서의 핵심 약점 3가지 — 어느 문장/구조가 부족한지
+3. 결정적 차이점 요약 — 합격 자소서 패턴 vs 내 자소서 패턴
+4. 내 자소서 구체적 개선 제안 2~3가지 — 실제 수정 예시 문장 포함
+
+각 항목은 번호와 소제목으로 구분하고 서술형으로 작성하세요.`;
   const box=document.getElementById('result2'),btn=document.getElementById('btn-cmp');
   btn.disabled=true;box.className='result-box show';box.innerHTML='<span class="loading">비교 분석 중... ⏳</span>';
   try{box.textContent=await callClaude(prompt);}catch(e){box.textContent='오류: '+e.message;}
   btn.disabled=false;
+}
+
+// ── 합격 자소서 분석 ──────────────────────────────────
+async function runPassAnalysis(){
+  const text=document.getElementById('ana-pass-text').value.trim();
+  if(!text){alert('합격 자소서를 입력해주세요.');return;}
+  const cName=document.getElementById('ana-pass-company').value;
+  const c=companies.find(x=>x.name===cName);
+  const job=c?.job||'',industry=c?.industry||'';
+  const meta=[cName?`지원 기업: ${cName}`:'',industry?`산업군: ${industry}`:'',job?`지원 직무: ${job}`:''].filter(Boolean).join('\n');
+  const prompt=`당신은 10년 경력 채용 전문가이자 자기소개서 분석가입니다.
+${meta}
+분석 유형: 합격 자소서 — 왜 합격했는가?
+
+${ANA_FRAMEWORK}
+
+---합격 자소서---
+${text}
+---
+
+[합격 요인 심층 분석]
+1. 3C4P 관점 강점 — Customer/Company/Competitor/4P 항목별로 잘 된 부분 분석
+2. STAR 구조 완성도 — 어떤 부분이 설득력 있게 작성됐는지
+3. 지원동기 4원칙 충족 여부 — Why Us, 경험연결, 직무적합성, 차별성
+4. 합격을 이끈 핵심 문장 3개 인용 및 이유 설명
+5. 이 패턴을 내 자소서에 적용하는 방법
+
+각 항목은 번호와 소제목으로 구분하고 서술형으로 작성하세요.`;
+  const box=document.getElementById('result-pass'),btn=document.getElementById('btn-pass');
+  btn.disabled=true;box.className='result-box show';box.innerHTML='<span class="loading">합격 요인 분석 중... ⏳</span>';
+  try{box.textContent=await callClaude(prompt);}catch(e){box.textContent='오류: '+e.message;}
+  btn.disabled=false;
+}
+
+// ── 불합격 자소서 분석 ────────────────────────────────
+async function runFailAnalysis(){
+  const text=document.getElementById('ana-fail-text').value.trim();
+  if(!text){alert('불합격 자소서를 입력해주세요.');return;}
+  const cName=document.getElementById('ana-fail-company').value;
+  const c=companies.find(x=>x.name===cName);
+  const job=c?.job||'',industry=c?.industry||'';
+  const meta=[cName?`지원 기업: ${cName}`:'',industry?`산업군: ${industry}`:'',job?`지원 직무: ${job}`:''].filter(Boolean).join('\n');
+  const prompt=`당신은 10년 경력 채용 전문가이자 자기소개서 분석가입니다.
+${meta}
+분석 유형: 불합격 자소서 — 왜 떨어졌는가?
+
+${ANA_FRAMEWORK}
+
+---불합격 자소서---
+${text}
+---
+
+[불합격 원인 심층 진단]
+1. 3C4P 관점 약점 — Customer/Company/Competitor/4P 항목별로 부족한 부분
+2. STAR 구조 문제점 — 어느 단계가 빠졌거나 설득력이 약한지
+3. 지원동기 4원칙 미충족 항목 — 구체적으로 어떤 부분이 부족한지
+4. 불합격 유발 문장 2~3개 인용 및 문제 설명
+5. 항목별 수정 예시 문장 제공 (원문 → 개선문 형식)
+
+각 항목은 번호와 소제목으로 구분하고 서술형으로 작성하세요.`;
+  const box=document.getElementById('result-fail'),btn=document.getElementById('btn-fail');
+  btn.disabled=true;box.className='result-box show';box.innerHTML='<span class="loading">불합격 원인 분석 중... ⏳</span>';
+  try{box.textContent=await callClaude(prompt);}catch(e){box.textContent='오류: '+e.message;}
+  btn.disabled=false;
+}
+
+// ── 지원동기 작성기 ───────────────────────────────────
+async function runMotiveGenerator(){
+  const article=document.getElementById('motive-article').value.trim();
+  const experience=document.getElementById('motive-experience').value.trim();
+  const jobGoal=document.getElementById('motive-job').value.trim();
+  const cName=document.getElementById('ana-motive-company').value;
+  const c=companies.find(x=>x.name===cName);
+  const job=c?.job||'',industry=c?.industry||'';
+  if(!article||!experience){alert('기사/기업 정보와 본인 경험을 모두 입력해주세요.');return;}
+  const meta=[cName?`지원 기업: ${cName}`:'',industry?`산업군: ${industry}`:'',job?`지원 직무: ${job}`:'',jobGoal?`포부: ${jobGoal}`:''].filter(Boolean).join('\n');
+  const prompt=`당신은 10년 경력 채용 전문가이자 자기소개서 코치입니다.
+아래 정보를 바탕으로 설득력 있는 지원동기를 작성해주세요.
+
+${meta}
+
+[기사·기업 정보 스크랩]
+${article}
+
+[지원자의 관련 경험]
+${experience}
+
+[지원동기 작성 원칙]
+1. A회사가 B기술/전략을 추진하고 있다
+2. 나는 이것이 어떤 장점으로 시장에서 성장할 것이라 생각하며, 어떤 한계가 있다고 본다
+3. 나는 내 경험(3C4P 구조)으로 이 문제를 해결하고 싶어 지원했다
+4. Why Us — 이 기업이어야 하는 구체적 이유
+5. 입사 후 1~3년 기여 계획
+
+[출력 형식]
+① 지원동기 예시문 (300~500자, 자연스러운 서술체)
+② 핵심 포인트 설명 (왜 이 구조가 효과적인지 3줄)
+③ 추가로 보강하면 좋을 내용 1~2가지
+
+실제 지원자가 쓴 것처럼 자연스럽고 진정성 있게 작성해주세요.`;
+  const box=document.getElementById('result-motive'),btn=document.getElementById('btn-motive');
+  btn.disabled=true;box.className='result-box show';box.innerHTML='<span class="loading">지원동기 생성 중... ⏳</span>';
+  try{box.textContent=await callClaude(prompt);}catch(e){box.textContent='오류: '+e.message;}
+  btn.disabled=false;
+}
+
+
+// ── 채용공고 분석 ──────────────────────────────────────
+let jpImageBase64 = null;
+let jpImageType = 'image/jpeg';
+
+function handleJobPostImage(inp){
+  const file = inp.files[0];
+  if(!file) return;
+  jpImageType = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    jpImageBase64 = dataUrl.split(',')[1];
+    document.getElementById('jp-preview').src = dataUrl;
+    document.getElementById('jp-preview-wrap').style.display = 'block';
+    document.getElementById('jp-drop-zone').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearJobPostImage(){
+  jpImageBase64 = null;
+  document.getElementById('jp-file').value = '';
+  document.getElementById('jp-preview-wrap').style.display = 'none';
+  document.getElementById('jp-drop-zone').style.display = 'block';
+}
+
+// 드래그 앤 드롭 지원
+document.addEventListener('DOMContentLoaded', () => {
+  const zone = document.getElementById('jp-drop-zone');
+  if(!zone) return;
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = 'var(--accent)'; });
+  zone.addEventListener('dragleave', () => { zone.style.borderColor = 'var(--border2)'; });
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.style.borderColor = 'var(--border2)';
+    const file = e.dataTransfer.files[0];
+    if(file && file.type.startsWith('image/')){
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      document.getElementById('jp-file').files = dt.files;
+      handleJobPostImage(document.getElementById('jp-file'));
+    }
+  });
+});
+
+async function runJobPostAnalysis(){
+  const job1 = document.getElementById('jp-job1').value.trim();
+  const job2 = document.getElementById('jp-job2').value.trim();
+  const job3 = document.getElementById('jp-job3').value.trim();
+  const textInput = document.getElementById('jp-text').value.trim();
+
+  if(!job1){ alert('직무 1을 입력해주세요.'); return; }
+  if(!jpImageBase64 && !textInput){ alert('채용공고 이미지를 올리거나 텍스트를 입력해주세요.'); return; }
+
+  const jobs = [job1, job2, job3].filter(Boolean);
+  const jobList = jobs.map((j,i) => `직무 ${i+1}: ${j}`).join('\n');
+
+  const box = document.getElementById('result-jp');
+  const btn = document.getElementById('btn-jp');
+  btn.disabled = true;
+  box.className = 'result-box show';
+  box.innerHTML = '<span class="loading">채용공고 분석 중... ⏳</span>';
+
+  try {
+    const EDGE_URL = SUPABASE_URL + '/functions/v1/claude-proxy';
+
+    let requestBody;
+
+    if(jpImageBase64){
+      // 이미지 + 텍스트 조합으로 분석
+      const prompt = `당신은 채용 전문가입니다. 아래 채용공고 이미지와 지정된 직무를 분석해주세요.
+
+분석할 직무:
+${jobList}
+
+${textInput ? '[추가 텍스트 정보]\n' + textInput : ''}
+
+각 직무별로 다음 형식으로 정리해주세요:
+
+## [직무명]
+
+### 1. 담당업무
+- 핵심 업무 5~8가지를 bullet로 정리
+
+### 2. 필요역량
+- 하드스킬 (기술/지식/자격증)
+- 소프트스킬 (태도/성향/협업능력)
+
+### 3. 자소서 키워드
+이 직무 자소서에 반드시 담아야 할 키워드 5~8개
+
+### 4. 이 직무에서 원하는 인재상
+2~3줄로 요약
+
+---`;
+
+      requestBody = JSON.stringify({
+        prompt,
+        max_tokens: 2000,
+        image: jpImageBase64,
+        image_type: jpImageType
+      });
+    } else {
+      // 텍스트만으로 분석
+      const prompt = `당신은 채용 전문가입니다. 아래 채용공고 내용과 지정된 직무를 분석해주세요.
+
+분석할 직무:
+${jobList}
+
+[채용공고 내용]
+${textInput}
+
+각 직무별로 다음 형식으로 정리해주세요:
+
+## [직무명]
+
+### 1. 담당업무
+- 핵심 업무 5~8가지를 bullet로 정리
+
+### 2. 필요역량
+- 하드스킬 (기술/지식/자격증)
+- 소프트스킬 (태도/성향/협업능력)
+
+### 3. 자소서 키워드
+이 직무 자소서에 반드시 담아야 할 키워드 5~8개
+
+### 4. 이 직무에서 원하는 인재상
+2~3줄로 요약
+
+---`;
+
+      requestBody = JSON.stringify({ prompt, max_tokens: 2000 });
+    }
+
+    const res = await fetch(EDGE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: requestBody
+    });
+
+    if(!res.ok){
+      const err = await res.json().catch(()=>({}));
+      throw new Error(err.error || `서버 오류 (${res.status})`);
+    }
+    const data = await res.json();
+    if(data.error) throw new Error(data.error);
+    box.textContent = data.result || '';
+  } catch(e){
+    box.textContent = '오류: ' + e.message;
+  }
+  btn.disabled = false;
 }
 
 // ── SETTINGS ──────────────────────────────────────────
