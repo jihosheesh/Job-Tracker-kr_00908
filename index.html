@@ -1137,12 +1137,18 @@ function syncAnaCompany(selId){
 
 // ── STATS ─────────────────────────────────────────────
 function renderStats(){
-  const total=companies.length,passed=companies.filter(c=>c.steps[3]).length,
-        failed=companies.filter(c=>c.steps[4]).length,docs=companies.filter(c=>c.steps[0]).length;
+  const total   = companies.length;
+  const subCnt  = companies.filter(c=>c.steps[0]).length;
+  const docsCnt = companies.filter(c=>c.steps[1]).length;
+  const passed  = companies.filter(c=>c.steps[4]).length;
+  const failed  = companies.filter(c=>c.steps[5]).length;
   document.getElementById('stats-grid').innerHTML=[
-    ["전체 지원",total,"var(--accent)"],["서류제출",submitCount,"var(--text2)"],["서류합격",docs,"var(--text)"],
-    ["진행 중",total-passed-failed,"var(--amber)"],
-    ["최종합격",passed,"var(--green)"],["불합격",failed,"var(--red)"],
+    ["전체 지원",  total,   "var(--accent)"],
+    ["서류제출",   subCnt,  "var(--text2)"],
+    ["서류합격",   docsCnt, "var(--text)"],
+    ["진행 중",    total-passed-failed, "var(--amber)"],
+    ["최종합격",   passed,  "var(--green)"],
+    ["불합격",     failed,  "var(--red)"],
   ].map(([l,v,c],i)=>`<div class="stat-card"><div class="stat-label">${l}</div><div class="stat-val" style="color:${i===4||i===5?c:'var(--text)'}">${v}</div></div>`).join('');
 }
 
