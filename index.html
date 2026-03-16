@@ -2029,9 +2029,9 @@ function addQA(type){
       <select class="qa-type-sel" id="qt-${type}-${n}" style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rs);padding:8px 12px;color:var(--text);font-size:12px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;flex-shrink:0;min-width:140px">
         ${typeOpts}
       </select>
-      <input class="qa-question" id="qq-${type}-${n}" placeholder="문항 내용 입력 (예: 지원동기를 작성해주세요)" style="flex:1;min-width:0">
+      <input id="qq-${type}-${n}" placeholder="문항 내용 입력 (예: 지원동기를 작성해주세요)" style="flex:1;min-width:0;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rs);padding:10px 14px;color:var(--text);font-size:13px;font-family:Noto Sans KR,sans-serif;outline:none;box-sizing:border-box">
     </div>
-    <textarea class="qa-answer" id="qa-${type}-${n}-ans" rows="10" placeholder="자소서 답변을 여기에 붙여넣으세요..."></textarea>
+    <textarea id="qa-${type}-${n}-ans" rows="10" placeholder="자소서 답변을 여기에 붙여넣으세요..." style="width:100%;min-height:220px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rs);padding:12px 14px;color:var(--text);font-size:13px;font-family:Noto Sans KR,sans-serif;outline:none;resize:vertical;line-height:1.75;box-sizing:border-box;display:block;margin-top:4px"></textarea>
   `;
   list.appendChild(div);
 }
