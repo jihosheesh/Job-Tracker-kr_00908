@@ -1604,18 +1604,16 @@ ${text}
     // 구분선 텍스트 추가
     box.textContent += '\n\n' + '─'.repeat(40) + '\n📝 2단계: 3C4P & 개선사항 분석 중... ⏳';
 
-    const prompt2=`당신은 10년 경력 채용 전문가입니다.
+    const prompt2=`채용 전문가로서 아래 자소서의 3C4P를 분석하고 개선점 2가지만 알려주세요.
 ${meta}
 
----자소서---
-${text}
----
+자소서: ${text.slice(0,1000)}...
 
-[2단계 — 3C4P & 개선사항]
-1. 3C4P 분석 (Customer/Company/Competitor/Product/Place/Price/Promotion 각각 한 줄 평가)
-2. 개선 필요 사항 2~3가지 (원문 인용 → 수정 예시)
+형식:
+[3C4P] Customer/Company/Competitor/Product/Place/Price/Promotion 각 1줄
+[개선점] 2가지 (원문인용→수정예시)
 
-간결하게 서술형으로 작성하세요.`;
+300자 이내로 간결하게.`;
 
     const result2 = await callClaude(prompt2);
     // 로딩 텍스트 제거하고 결과 추가
