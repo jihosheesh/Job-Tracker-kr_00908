@@ -1183,7 +1183,7 @@ function renderTable(){
     </tr>`).join('');
 }
 
-function render(){ renderStats(); renderTable(); }
+function render(){ renderStats(); renderTable(); if(typeof renderCalendar==='function'&&document.getElementById('tab-calendar')?.classList.contains('active')) renderCalendar(); }
 
 // ── CALENDAR ──────────────────────────────────────────
 let calYear  = new Date().getFullYear();
@@ -1449,9 +1449,13 @@ function getGroupMap(){
 function renderStatsDash(){
   const el=document.getElementById('stats-dashboard');
   if(!companies.length){el.innerHTML='<div class="no-data">기업을 추가하면 통계가 표시됩니다.</div>';return;}
-  const total=companies.length,passed=companies.filter(c=>c.steps[3]).length,
-        failed=companies.filter(c=>c.steps[4]).length,docs=companies.filter(c=>c.steps[0]).length,
-        int1=companies.filter(c=>c.steps[1]).length,int2=companies.filter(c=>c.steps[2]).length;
+  const total       = companies.length;
+  const submitCount = companies.filter(c=>c.steps[0]).length;
+  const docs        = companies.filter(c=>c.steps[1]).length;
+  const int1        = companies.filter(c=>c.steps[2]).length;
+  const int2        = companies.filter(c=>c.steps[3]).length;
+  const passed      = companies.filter(c=>c.steps[4]).length;
+  const failed      = companies.filter(c=>c.steps[5]).length;
   const pct=(n,d)=>d?Math.round(n/d*100):0;
   const indMap={};
   for(const c of companies){
@@ -2130,9 +2134,10 @@ function getQAText(type){
   const items = list.querySelectorAll('.qa-item');
   if(!items.length) return '';
   return Array.from(items).map((item, i) => {
-    const qEl  = item.querySelector('.qa-question');
-    const aEl  = item.querySelector('.qa-answer');
-    const tEl  = item.querySelector('.qa-type-sel');
+    const n = item.id.split('-').pop(); // qa-single-1 → 1
+    const qEl = item.querySelector('input');
+    const aEl = document.getElementById('qa-'+type+'-'+n+'-ans');
+    const tEl = item.querySelector('select');
     const q = qEl?.value?.trim() || '';
     const a = aEl?.value?.trim() || '';
     const t = tEl?.value || 'etc';
@@ -2143,13 +2148,13 @@ function getQAText(type){
 }
 
 function getQAItems(type){
-  // 문항별 {question, answer, typeValue, typePrompt} 배열 반환
   const list = document.getElementById('qa-list-'+type);
   if(!list) return [];
   return Array.from(list.querySelectorAll('.qa-item')).map((item,i) => {
-    const q = item.querySelector('.qa-question')?.value?.trim()||'';
-    const a = item.querySelector('.qa-answer')?.value?.trim()||'';
-    const t = item.querySelector('.qa-type-sel')?.value||'etc';
+    const n = item.id.split('-').pop();
+    const q = item.querySelector('input')?.value?.trim()||'';
+    const a = document.getElementById('qa-'+type+'-'+n+'-ans')?.value?.trim()||'';
+    const t = item.querySelector('select')?.value||'etc';
     const typeInfo = QA_TYPES.find(x=>x.value===t)||QA_TYPES[QA_TYPES.length-1];
     return {idx:i+1, question:q, answer:a, typeValue:t, typeLabel:typeInfo.label, typePrompt:typeInfo.prompt};
   }).filter(x=>x.answer);
@@ -2166,6 +2171,7 @@ function initQA(){
 
 // ── SETTINGS FUNCTIONS ────────────────────────────────
 function loadSettingsTab(){
+  if(!currentUser) return;
   // 프로필
   if(currentUser){
     const el = document.getElementById('profile-name');
