@@ -1795,8 +1795,10 @@ ${_singleText}
 
   const labels = {1:'📋 1단계 분석 중...', 2:'📝 2단계 분석 중...', 3:'🔧 3단계 분석 중...'};
 
-  // 버튼 상태
-  btn1.disabled=true; btn2.disabled=true; btn3.disabled=true;
+  // 버튼 상태 - disabled 대신 pointer-events로 처리
+  btn1.style.opacity="0.4"; btn1.style.pointerEvents="none";
+  btn2.style.opacity="0.4"; btn2.style.pointerEvents="none";
+  btn3.style.opacity="0.4"; btn3.style.pointerEvents="none";
 
   if(step===1){
     box.className='result-box show';
@@ -1810,22 +1812,22 @@ ${_singleText}
     if(step===1){
       box.textContent = result;
       btn2.style.display='inline-block';
-      btn2.disabled=false;
+      btn2.style.opacity="1"; btn2.style.pointerEvents="auto"; btn2.removeAttribute("disabled");
     } else {
       // 로딩 텍스트 교체
       box.textContent = box.textContent.replace('\n\n' + '━'.repeat(30) + '\n' + labels[step] + ' ⏳', '\n\n' + '━'.repeat(30) + '\n' + result);
       if(step===2){
         btn3.style.display='inline-block';
-        btn3.disabled=false;
+        btn3.style.opacity="1"; btn3.style.pointerEvents="auto"; btn3.removeAttribute("disabled");
       }
     }
   } catch(e){
     box.textContent += '\n오류: '+e.message;
   }
 
-  btn1.disabled=false;
-  btn2.disabled=false;
-  btn3.disabled=false;
+  btn1.style.opacity="1"; btn1.style.pointerEvents="auto"; btn1.removeAttribute("disabled");
+  btn2.style.opacity="1"; btn2.style.pointerEvents="auto";
+  btn3.style.opacity="1"; btn3.style.pointerEvents="auto";
 }
 
 async function runCompare(){
