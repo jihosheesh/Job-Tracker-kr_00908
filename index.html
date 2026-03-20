@@ -1810,16 +1810,22 @@ ${_singleText}
     if(step===1){
       box.textContent = result;
       btn2.style.display='inline-block';
+      btn2.disabled=false;
     } else {
       // 로딩 텍스트 교체
       box.textContent = box.textContent.replace('\n\n' + '━'.repeat(30) + '\n' + labels[step] + ' ⏳', '\n\n' + '━'.repeat(30) + '\n' + result);
-      if(step===2) btn3.style.display='inline-block';
+      if(step===2){
+        btn3.style.display='inline-block';
+        btn3.disabled=false;
+      }
     }
   } catch(e){
     box.textContent += '\n오류: '+e.message;
   }
 
   btn1.disabled=false;
+  btn2.disabled=false;
+  btn3.disabled=false;
 }
 
 async function runCompare(){
