@@ -1223,8 +1223,10 @@ function renderStats(){
 // ── TABLE ─────────────────────────────────────────────
 function renderTable(){
   const tb=document.getElementById('tbody');
+  const filtered = getFilteredCompanies();
   if(!companies.length){tb.innerHTML=`<tr><td colspan="11" class="empty-state">기업을 추가해보세요!</td></tr>`;return;}
-  tb.innerHTML=companies.map(c=>`
+  if(!filtered.length){tb.innerHTML=`<tr><td colspan="11" class="empty-state">해당 단계의 기업이 없습니다.</td></tr>`;return;}
+  tb.innerHTML=filtered.map(c=>`
     <tr id="row-${c.id}">
       <td><strong>${esc(c.name)}</strong></td>
       <td>
