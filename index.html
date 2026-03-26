@@ -506,6 +506,11 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <button class="pipe-filter-btn f-int"     onclick="setPipeFilter('int',this)">🎤 면접중</button>
     <button class="pipe-filter-btn f-pass"    onclick="setPipeFilter('pass',this)">🏆 최종합격</button>
     <button class="pipe-filter-btn f-fail"    onclick="setPipeFilter('fail',this)">❌ 탈락</button>
+    <div style="margin-left:auto;display:flex;gap:4px">
+      <button class="pipe-filter-btn" id="sort-asc-btn"  onclick="setSortOrder('asc')" >📅 마감일 ↑</button>
+      <button class="pipe-filter-btn" id="sort-desc-btn" onclick="setSortOrder('desc')">📅 마감일 ↓</button>
+      <button class="pipe-filter-btn" id="sort-none-btn" onclick="setSortOrder('none')" style="display:none">✕ 정렬 해제</button>
+    </div>
   </div>
 
   <div class="add-bar">
@@ -1223,7 +1228,7 @@ function renderStats(){
 // ── TABLE ─────────────────────────────────────────────
 function renderTable(){
   const tb=document.getElementById('tbody');
-  const filtered = getFilteredCompanies();
+  const filtered = getSortedCompanies(getFilteredCompanies());
   if(!companies.length){tb.innerHTML=`<tr><td colspan="11" class="empty-state">기업을 추가해보세요!</td></tr>`;return;}
   if(!filtered.length){tb.innerHTML=`<tr><td colspan="11" class="empty-state">해당 단계의 기업이 없습니다.</td></tr>`;return;}
   tb.innerHTML=filtered.map(c=>`
@@ -2302,6 +2307,31 @@ async function updateFeedbackRedDot(){
     const dot = document.getElementById('feedback-red-dot');
     if(dot) dot.style.display = count > 0 ? 'block' : 'none';
   } catch(e){}
+}
+
+
+// ── 정렬 ─────────────────────────────────────────────
+let currentSortOrder = 'none';
+
+function setSortOrder(order){
+  currentSortOrder = order;
+  document.getElementById('sort-asc-btn').classList.toggle('active', order==='asc');
+  document.getElementById('sort-desc-btn').classList.toggle('active', order==='desc');
+  document.getElementById('sort-none-btn').style.display = order==='none' ? 'none' : 'inline-block';
+  renderTable();
+}
+
+function getSortedCompanies(list){
+  if(currentSortOrder === 'none') return list;
+  return [...list].sort((a, b) => {
+    const da = a.deadline ? new Date(a.deadline) : null;
+    const db = b.deadline ? new Date(b.deadline) : null;
+    // 마감일 없는 것은 항상 뒤로
+    if(!da && !db) return 0;
+    if(!da) return 1;
+    if(!db) return -1;
+    return currentSortOrder === 'asc' ? da - db : db - da;
+  });
 }
 
 // ── SETTINGS FUNCTIONS ────────────────────────────────
