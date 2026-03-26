@@ -506,7 +506,11 @@ tr:hover td{background:rgba(255,255,255,.015);}
     <button class="pipe-filter-btn f-int"     onclick="setPipeFilter('int',this)">🎤 면접중</button>
     <button class="pipe-filter-btn f-pass"    onclick="setPipeFilter('pass',this)">🏆 최종합격</button>
     <button class="pipe-filter-btn f-fail"    onclick="setPipeFilter('fail',this)">❌ 탈락</button>
-    <div style="margin-left:auto;display:flex;gap:4px">
+    <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);cursor:pointer;margin-left:auto;white-space:nowrap">
+      <input type="checkbox" id="hide-expired" onchange="renderTable()" style="cursor:pointer">
+      마감된 공고 숨기기
+    </label>
+    <div style="display:flex;gap:4px">
       <button class="pipe-filter-btn" id="sort-asc-btn"  onclick="setSortOrder('asc')" >📅 마감일 ↑</button>
       <button class="pipe-filter-btn" id="sort-desc-btn" onclick="setSortOrder('desc')">📅 마감일 ↓</button>
       <button class="pipe-filter-btn" id="sort-none-btn" onclick="setSortOrder('none')" style="display:none">✕ 정렬 해제</button>
@@ -2287,15 +2291,31 @@ function setPipeFilter(filter, btn){
 }
 
 function getFilteredCompanies(){
+  const hideExpired = document.getElementById('hide-expired')?.checked;
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  let list;
   switch(currentPipeFilter){
-    case 'unsubmit': return companies.filter(c => !c.steps[0] && !c.steps[5]);
-    case 'submit':   return companies.filter(c =>  c.steps[0] && !c.steps[1] && !c.steps[5]);
-    case 'doc':      return companies.filter(c =>  c.steps[1] && !c.steps[2] && !c.steps[3] && !c.steps[4] && !c.steps[5]);
-    case 'int':      return companies.filter(c => (c.steps[2] || c.steps[3]) && !c.steps[4] && !c.steps[5]);
-    case 'pass':     return companies.filter(c =>  c.steps[4]);
-    case 'fail':     return companies.filter(c =>  c.steps[5]);
-    default:         return companies;
+    case 'unsubmit': list = companies.filter(c => !c.steps[0] && !c.steps[5]); break;
+    case 'submit':   list = companies.filter(c =>  c.steps[0] && !c.steps[1] && !c.steps[5]); break;
+    case 'doc':      list = companies.filter(c =>  c.steps[1] && !c.steps[2] && !c.steps[3] && !c.steps[4] && !c.steps[5]); break;
+    case 'int':      list = companies.filter(c => (c.steps[2] || c.steps[3]) && !c.steps[4] && !c.steps[5]); break;
+    case 'pass':     list = companies.filter(c =>  c.steps[4]); break;
+    case 'fail':     list = companies.filter(c =>  c.steps[5]); break;
+    default:         list = companies;
   }
+
+  // 마감된 공고 숨기기 (마감일이 오늘보다 이전 + 아직 합격/탈락 아닌 것)
+  if(hideExpired){
+    list = list.filter(c => {
+      if(!c.deadline) return true; // 마감일 없으면 표시
+      if(c.steps[4] || c.steps[5]) return true; // 합격/탈락은 항상 표시
+      const dl = new Date(c.deadline); dl.setHours(0,0,0,0);
+      return dl >= today;
+    });
+  }
+
+  return list;
 }
 
 // ── 문의 탭 레드닷 ────────────────────────────────────
