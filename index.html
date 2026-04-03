@@ -1805,9 +1805,14 @@ async function runSingle(step){
   // 문항별 맞춤 분석 프롬프트 생성
   const qaItems = getQAItems('single');
   const jdContext = getJDContext();
+  // 직무 이탈 방지 지시문 생성
+  const jobGuard = _singleMeta
+    ? `\n\n[중요 지시사항]\n위에 명시된 지원 직무와 기업 정보만을 기준으로 분석하세요.\n자소서 본문에 다른 키워드(예: 글로벌, 해외, 금융, IT 등)가 등장해도, 입력된 직무 정보가 없으면 임의로 직무를 추정하거나 연결짓지 마세요.\n직무 정보가 없으면 일반 역량(문제해결, 협업, 실행력 등) 기준으로만 분석하세요.`
+    : `\n\n[중요 지시사항]\n지원 직무가 입력되지 않았습니다. 자소서 내용에서 직무를 임의로 추정하지 마세요.\n일반적인 역량(문제해결력, 실행력, 협업, 커뮤니케이션 등) 기준으로만 분석하세요.`;
+
   const customPrompt1 = qaItems.length > 0
     ? `당신은 채용 전문가입니다. 아래 자소서를 문항별로 분석해주세요.
-${_singleMeta}${jdContext}
+${_singleMeta}${jdContext}${jobGuard}
 
 ${qaItems.map(item=>`
 === 문항 ${item.idx}: ${item.typeLabel} ===
@@ -1826,7 +1831,7 @@ ${item.typePrompt}
 마지막에 전체 종합 점수(100점)와 한 줄 총평 추가.
 서술형으로 작성.`
     : `당신은 채용 전문가입니다.
-${_singleMeta}
+${_singleMeta}${jobGuard}
 ---자소서---
 ${_singleText}
 ---
@@ -1840,7 +1845,7 @@ ${_singleText}
     1: customPrompt1,
 
     2: `당신은 채용 전문가입니다.
-${_singleMeta}
+${_singleMeta}${jobGuard}
 ---자소서---
 ${_singleText}
 ---
@@ -1850,7 +1855,7 @@ Customer/Company/Competitor/Product/Place/Price/Promotion
 서술형으로 작성.`,
 
     3: `당신은 채용 전문가입니다.
-${_singleMeta}
+${_singleMeta}${jobGuard}
 ---자소서---
 ${_singleText}
 ---
