@@ -4352,17 +4352,22 @@ function syncAnaCompany(selId){
 }
 
 // ── STATS ─────────────────────────────────────────────
+function getActiveProgressCount(list=companies){
+  return list.filter(c => c.steps[0] && !c.steps[4] && !c.steps[5]).length;
+}
+
 function renderStats(){
   const total   = companies.length;
   const subCnt  = companies.filter(c=>c.steps[0]).length;
   const docsCnt = companies.filter(c=>c.steps[1]).length;
   const passed  = companies.filter(c=>c.steps[4]).length;
   const failed  = companies.filter(c=>c.steps[5]).length;
+  const active  = getActiveProgressCount(companies);
   document.getElementById('stats-grid').innerHTML=[
     ["전체 지원",  total,   "var(--accent)"],
     ["서류제출",   subCnt,  "var(--text2)"],
     ["서류합격",   docsCnt, "var(--text)"],
-    ["진행 중",    total-passed-failed, "var(--amber)"],
+    ["진행 중",    active,  "var(--amber)"],
     ["최종합격",   passed,  "var(--green)"],
     ["불합격",     failed,  "var(--red)"],
   ].map(([l,v,c],i)=>`<div class="stat-card"><div class="stat-label">${l}</div><div class="stat-val" style="color:${i===4||i===5?c:'var(--text)'}">${v}</div></div>`).join('');
@@ -4707,6 +4712,7 @@ function renderStatsDash(){
   const int2        = companies.filter(c=>c.steps[3]).length;
   const passed      = companies.filter(c=>c.steps[4]).length;
   const failed      = companies.filter(c=>c.steps[5]).length;
+  const active      = getActiveProgressCount(companies);
   const pct=(n,d)=>d?Math.round(n/d*100):0;
   const indMap={};
   for(const c of companies){
@@ -4721,7 +4727,7 @@ function renderStatsDash(){
   el.innerHTML=`
   <div class="dash-section"><div class="dash-section-title">전체 현황</div>
   <div class="dash-grid-4">
-    ${[["총 지원",total+"개","var(--accent)"],["합격률",pct(passed,total)+"%","var(--green)"],["진행 중",total-passed-failed+"","var(--amber)"],["불합격",failed+"","var(--red)"]].map(([l,v,c])=>`
+    ${[["총 지원",total+"개","var(--accent)"],["합격률",pct(passed,total)+"%","var(--green)"],["진행 중",active+"","var(--amber)"],["불합격",failed+"","var(--red)"]].map(([l,v,c])=>`
     <div class="dash-card" style="text-align:center"><div class="dash-card-title">${l}</div>
     <div class="big-num" style="color:${c}">${v}</div></div>`).join('')}
   </div></div>
