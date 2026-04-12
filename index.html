@@ -3181,6 +3181,70 @@ body[data-tracker-view='table'] .tracker-view-btn[data-view='table']{
   }
 }
 
+/* ══ NEWS BRIEFING CARD ══ */
+.news-briefing{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;margin-bottom:16px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+.news-briefing::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);}
+.news-briefing-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.news-briefing-title{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px;}
+.news-briefing-more{font-size:11px;font-weight:600;color:var(--accent);cursor:pointer;text-decoration:none;white-space:nowrap;}
+.news-briefing-more:hover{text-decoration:underline;}
+.news-briefing-list{display:flex;flex-direction:column;gap:6px;}
+.news-briefing-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text2);line-height:1.5;}
+.news-briefing-item::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent);margin-top:6px;flex-shrink:0;}
+.news-briefing-point{font-size:11px;color:var(--text3);margin-left:13px;}
+.news-briefing-loading{font-size:12px;color:var(--text3);padding:4px 0;}
+
+/* ══ ANALYSIS CONTEXT CARD ══ */
+.ana-context-card{background:linear-gradient(135deg,var(--accent-light),rgba(124,58,237,.08));border:1px solid rgba(91,110,245,.2);border-radius:var(--r);padding:16px 20px;margin-bottom:18px;display:none;}
+.ana-context-card.visible{display:block;}
+.ana-context-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
+.ana-context-company{font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+.ana-context-meta{display:flex;gap:12px;font-size:12px;color:var(--text2);}
+.ana-context-meta span{display:flex;align-items:center;gap:4px;}
+.ana-context-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.ana-context-btn{padding:6px 14px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--bg2);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;}
+.ana-context-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light);}
+
+/* ══ AI HELPER BUTTON ══ */
+.action-btn.ai-help{color:var(--accent);font-size:13px;}
+.action-btn.ai-help:hover{background:var(--accent-light);}
+
+/* ══ TOAST NOTIFICATION SYSTEM ══ */
+#toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column-reverse;gap:10px;pointer-events:none;}
+.toast{pointer-events:auto;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;box-shadow:var(--shadow-md);display:flex;align-items:flex-start;gap:12px;min-width:320px;max-width:420px;cursor:pointer;animation:toastIn .35s ease;transition:opacity .3s,transform .3s;}
+.toast.toast-out{opacity:0;transform:translateX(40px);}
+.toast-icon{font-size:20px;line-height:1;flex-shrink:0;margin-top:1px;}
+.toast-body{flex:1;min-width:0;}
+.toast-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.toast-desc{font-size:12px;color:var(--text2);line-height:1.5;}
+.toast-action{display:inline-block;margin-top:6px;font-size:11px;font-weight:600;color:var(--accent);cursor:pointer;text-decoration:underline;}
+.toast-action:hover{color:var(--accent2);}
+.toast-close{font-size:16px;color:var(--text3);cursor:pointer;line-height:1;padding:2px;flex-shrink:0;}
+.toast-close:hover{color:var(--text);}
+.toast-warn{border-left:3px solid var(--amber);}
+.toast-critical{border-left:3px solid var(--red);}
+.toast-success{border-left:3px solid var(--green);}
+.toast-info{border-left:3px solid var(--accent);}
+@keyframes toastIn{from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:translateX(0);}}
+
+/* ══ CHECKLIST MODAL ══ */
+.checklist-modal .checklist-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text);}
+.checklist-modal .checklist-item:last-child{border-bottom:none;}
+.checklist-modal .checklist-item input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;}
+.checklist-modal .checklist-item label{cursor:pointer;line-height:1.5;}
+.checklist-modal .checklist-item.checked label{text-decoration:line-through;color:var(--text3);}
+.checklist-progress{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.checklist-progress-bar{flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.checklist-progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s ease;}
+.checklist-progress-text{font-size:11px;color:var(--text3);min-width:40px;text-align:right;}
+
+/* ══ REVIEW MODAL ══ */
+.review-modal .review-field{margin-bottom:14px;}
+.review-modal .review-field label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;}
+.review-modal .review-field textarea{width:100%;min-height:70px;resize:vertical;font-family:'Noto Sans KR',sans-serif;font-size:13px;line-height:1.6;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--rs);background:var(--bg2);color:var(--text);outline:none;transition:border-color .18s;}
+.review-modal .review-field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light);}
+.review-modal .review-stage-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--accent-light);color:var(--accent);margin-left:8px;}
+
 </style>
 </head>
 <body>
@@ -3325,7 +3389,6 @@ body[data-tracker-view='table'] .tracker-view-btn[data-view='table']{
         <div class="logo"><span class="logo-dot"><span class="brand-mark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none"><defs><linearGradient id="g" x1="10" y1="8" x2="56" y2="58" gradientUnits="userSpaceOnUse"><stop stop-color="#6E84FF"/><stop offset="0.55" stop-color="#5B6EF5"/><stop offset="1" stop-color="#7C3AED"/></linearGradient><linearGradient id="shine" x1="18" y1="14" x2="46" y2="46" gradientUnits="userSpaceOnUse"><stop stop-color="white" stop-opacity="0.48"/><stop offset="1" stop-color="white" stop-opacity="0"/></linearGradient></defs><rect x="6" y="6" width="52" height="52" rx="16" fill="url(#g)"/><path d="M18 20C18 18.8954 18.8954 18 20 18H31C32.1046 18 33 18.8954 33 20V25C33 26.1046 32.1046 27 31 27H26V32H36C37.1046 32 38 32.8954 38 34V39C38 40.1046 37.1046 41 36 41H31V46H44C45.1046 46 46 46.8954 46 48C46 49.1046 45.1046 50 44 50H27C25.8954 50 25 49.1046 25 48V41H20C18.8954 41 18 40.1046 18 39V34C18 32.8954 18.8954 32 20 32H25V27H20C18.8954 27 18 26.1046 18 25V20Z" fill="white"/><path d="M36.5 18.5L42.5 18.5C43.6046 18.5 44.5 19.3954 44.5 20.5V26.5" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M34 29L44 19" stroke="white" stroke-width="4" stroke-linecap="round"/><path d="M14 10H50C52.7614 10 55 12.2386 55 15V28" stroke="url(#shine)" stroke-width="2" stroke-linecap="round"/></svg></span></span><span class="logo-text">StepUp</span></div>
         <span class="brand-pill" aria-label="브랜드 포지션">Career OS</span>
       </div>
-      <div class="sidebar-copy">이름 + 전화번호 뒤 4자리 로그인과 기존 데이터 흐름은 그대로 유지하면서, 모바일과 데스크톱 모두에서 더 선명하게 읽히는 헤더 경험으로 정리했습니다.</div>
     </div>
     <div class="sidebar-controls">
       <div id="user-badge-wrap"></div>
@@ -3344,53 +3407,23 @@ body[data-tracker-view='table'] .tracker-view-btn[data-view='table']{
       <button class="tab-btn" onclick="switchTab('feedback',this)">문의<span class="tab-red-dot" id="feedback-red-dot"></span></button>
       <button class="tab-btn" onclick="switchTab('settings',this)">설정</button>
     </div>
-    <div class="sidebar-card">
-      <h4>오늘의 운영 포인트</h4>
-      <p>파이프라인, 달력, 보드, 자소서 분석을 하나의 흐름으로 이어서 볼 수 있도록 주요 화면을 카드형 워크스페이스로 정리했습니다.</p>
-      <span class="mini-chip">Career OS Dashboard</span>
-    </div>
-    <div class="sidebar-card">
-      <h4>추천 사용 순서</h4>
-      <p>파이프라인에 지원 현황을 기록하고, 채용달력으로 마감일을 확인한 뒤, 자소서 분석 탭에서 문항별 개선까지 연결해보세요.</p>
-    </div>
   </div>
 </header>
 
 <main class="main">
   <div class="main-inner">
-    <section class="workspace-topbar">
-      <div class="workspace-hero">
-        <div class="workspace-kicker">StepUp Employment OS</div>
-        <div class="workspace-title">취업 준비의 모든 단계를<br>하나의 사이드바 워크스페이스에서 관리하세요.</div>
-        <div class="workspace-desc">기존 로그인 방식과 Supabase 저장 구조는 그대로 유지하면서, 파이프라인·뉴스·달력·자소서 분석·설정 화면을 더 빠르게 오갈 수 있도록 정보 구조와 시각 계층만 새롭게 정돈했습니다.</div>
-        <div class="workspace-actions">
-          <button class="btn" onclick="switchTab('tracker', document.querySelectorAll('.tab-btn')[0])">파이프라인 바로가기</button>
-          <button class="btn btn-muted" onclick="switchTab('analysis', document.querySelectorAll('.tab-btn')[4])">자소서 분석 열기</button>
-          <button class="btn btn-muted workspace-tertiary" onclick="switchTab('calendar', document.querySelectorAll('.tab-btn')[2])">채용달력 보기</button>
-        </div>
-      </div>
-      <aside class="workspace-aside">
-        <div>
-          <h3>워크스페이스 리디자인</h3>
-          <p>상단 탭 구조를 좌측 탐색 중심으로 바꾸고, 각 탭은 독립적인 카드형 화면으로 정리했습니다.</p>
-        </div>
-        <div class="workspace-highlight">
-          <strong>로그인 방식 유지</strong>
-          이름 + 전화번호 뒤 4자리 입력, 기존 doLogin 흐름과 users/companies 연동 유지
-        </div>
-        <div class="workspace-highlight">
-          <strong>데이터 로직 유지</strong>
-          기존 함수명, DOM ID, 렌더링 함수, Supabase CRUD 흐름을 그대로 보존
-        </div>
-        <div class="workspace-highlight">
-          <strong>탐색성 개선</strong>
-          사이드바 중심 내비게이션, 넓어진 콘텐츠 영역, 카드형 섹션 레이아웃 적용
-        </div>
-      </aside>
-    </section>
-
 <!-- ══ TRACKER ══ -->
 <div class="section active" id="tab-tracker">
+  <!-- 뉴스 브리핑 카드 -->
+  <div class="news-briefing" id="news-briefing" style="display:none">
+    <div class="news-briefing-header">
+      <div class="news-briefing-title">📰 오늘의 채용 브리핑</div>
+      <a class="news-briefing-more" onclick="switchTab('news', document.querySelectorAll('.tab-btn')[1])">뉴스 더 보기 →</a>
+    </div>
+    <div class="news-briefing-list" id="news-briefing-list">
+      <div class="news-briefing-loading">채용 트렌드 불러오는 중...</div>
+    </div>
+  </div>
   <div class="stats-grid" id="stats-grid"></div>
 
   <!-- 단계별 필터 -->
@@ -3549,6 +3582,19 @@ body[data-tracker-view='table'] .tracker-view-btn[data-view='table']{
 <div class="section" id="tab-analysis">
   <p class="section-title">자소서 분석 및 가이드</p>
   <p class="section-desc">STAR·3C4P·HR 관점 기준으로 자소서를 분석하고, 지원동기 작성까지 도와드립니다.</p>
+
+  <!-- 기업 컨텍스트 카드 -->
+  <div class="ana-context-card" id="ana-context-card">
+    <div class="ana-context-top">
+      <div class="ana-context-company" id="ana-ctx-company"></div>
+      <div class="ana-context-meta" id="ana-ctx-meta"></div>
+    </div>
+    <div class="ana-context-actions">
+      <button class="ana-context-btn" onclick="switchAna('single',document.querySelector('.ana-tab'));updateAnalysisContext()">📝 제출 전 분석</button>
+      <button class="ana-context-btn" onclick="switchAna('motive',document.querySelectorAll('.ana-tab')[3]);syncMotiveCompany()">💡 지원동기 작성</button>
+      <button class="ana-context-btn" onclick="switchAna('jobpost',document.querySelectorAll('.ana-tab')[4])">📋 채용공고 분석</button>
+    </div>
+  </div>
 
   <div class="ana-nav">
     <button class="ana-tab active" onclick="switchAna('single',this)">📝 제출 전 분석</button>
@@ -4421,6 +4467,7 @@ function renderTable(force=false){
       <td style="text-align:center">${c.deadline?`<span style='font-size:11px;color:var(--text2)'>${c.deadline}</span>${deadlineBadge(c.deadline)}`:'<span style="color:var(--text3);font-size:11px">—</span>'}</td>
       <td><input class="memo-inp" value="${esc(c.memo)}" placeholder="메모..." onchange="updateMemo(${c.id},this.value)"></td>
       <td>
+        <button class="action-btn ai-help" onclick="openAIHelper(${c.id})" title="AI 자소서 도우미">🤖</button>
         <button class="action-btn edit" onclick="openEdit(${c.id})" title="수정">✏</button>
         <button class="action-btn del" onclick="deleteCompany(${c.id})" title="삭제">×</button>
       </td>
@@ -4550,6 +4597,7 @@ async function toggleStep(id,idx){
   if(idx===5&&!c.steps[5]) c.steps[4]=false;
   if(c.steps[idx]){for(let l=idx+1;l<5;l++) c.steps[l]=false;}
   c.steps[idx]=!c.steps[idx];
+  if(typeof onStepChange==='function') onStepChange(c, idx, c.steps[idx]);
   render();
   try{await sb.from('companies').update(stepsToDb(c.steps)).eq('id',id).eq('user_key',currentUser.key);}
   catch(e){alert('저장 오류: '+e.message);await fetchCompanies();render();}
@@ -5936,8 +5984,12 @@ async function fetchNews(force=false){
   btn.textContent = '⏳ 가져오는 중...';
   list.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text3);font-size:13px">취업 트렌드 분석 중... ⏳</div>';
 
-  const prompt = `취업준비생용 채용·취업 트렌드 인사이트 8개를 JSON 배열로만 출력하세요. 앞뒤 텍스트 없이 [로 시작 ]로 끝내세요.
-형식(필드명 정확히): [{"title":"제목","summary":"2문장 설명","point":"취준생 액션포인트 1문장","category":"trend|ai|market|corp","source":"출처","date":"2025또는2026"}]`;
+  const today = new Date(); const yyyy = today.getFullYear(); const mm = today.getMonth()+1;
+  const prompt = `현재 ${yyyy}년 ${mm}월 시점에서 유효한 채용·취업 트렌드 인사이트 8개를 JSON 배열로만 출력하세요.
+지금 취업 시장에서 실제로 일어나고 있는 변화, 기업들의 채용 전략 변화, 주목해야 할 직무 트렌드를 다루세요.
+과거에만 해당하는 뉴스는 제외하고, 현재 진행 중이거나 앞으로 영향을 줄 트렌드만 포함하세요.
+앞뒤 텍스트 없이 [로 시작 ]로 끝내세요.
+형식(필드명 정확히): [{"title":"제목","summary":"2문장 설명","point":"취준생 액션포인트 1문장","category":"trend|ai|market|corp","source":"출처","date":"${yyyy}-${String(mm).padStart(2,'0')}"}]`;
 
   try {
     const EDGE_URL = SUPABASE_URL + '/functions/v1/claude-proxy';
@@ -6735,6 +6787,275 @@ function toggleDark(){
   }
 })();
 </script>
+
+<!-- ══ AUTOMATION ENGINE ══ -->
+<script>
+// ─── TOAST SYSTEM ────────────────────────────────────
+function showToast(title, desc, type='info', options={}){
+  const container = document.getElementById('toast-container');
+  if(!container) return;
+  const icons = {info:'💡', warn:'⚠️', critical:'🔴', success:'🎉'};
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `
+    <div class="toast-icon">${options.icon || icons[type] || '💡'}</div>
+    <div class="toast-body">
+      <div class="toast-title">${title}</div>
+      <div class="toast-desc">${desc}</div>
+      ${options.actionLabel ? `<span class="toast-action" id="toast-action-${Date.now()}">${options.actionLabel}</span>` : ''}
+    </div>
+    <div class="toast-close" onclick="this.parentElement.classList.add('toast-out');setTimeout(()=>this.parentElement.remove(),300)">&times;</div>
+  `;
+  container.appendChild(toast);
+  if(options.onAction){
+    const actionEl = toast.querySelector('.toast-action');
+    if(actionEl) actionEl.addEventListener('click', () => { options.onAction(); toast.classList.add('toast-out'); setTimeout(()=>toast.remove(),300); });
+  }
+  toast.addEventListener('click', (e) => {
+    if(e.target.classList.contains('toast-close') || e.target.classList.contains('toast-action')) return;
+    toast.classList.add('toast-out'); setTimeout(()=>toast.remove(),300);
+  });
+  const duration = options.duration || 4000;
+  if(duration > 0) setTimeout(() => { if(toast.parentElement){ toast.classList.add('toast-out'); setTimeout(()=>toast.remove(),300); } }, duration);
+  return toast;
+}
+
+// ─── DEADLINE AUTO-ALERT ─────────────────────────────
+let _deadlineAlertShown = false;
+function checkDeadlineAlerts(){
+  if(_deadlineAlertShown) return;
+  const today = new Date().toISOString().slice(0,10);
+  const sessionKey = 'stepup_toast_shown_' + today;
+  if(sessionStorage.getItem(sessionKey)) return;
+  const urgent = companies
+    .filter(c => c.deadline && !c.steps[4] && !c.steps[5])
+    .map(c => ({ ...c, diff: deadlineDiffDays(c.deadline) }))
+    .filter(c => c.diff !== null && c.diff >= 0 && c.diff <= 3)
+    .sort((a,b) => a.diff - b.diff)
+    .slice(0, 3);
+  if(!urgent.length) return;
+  _deadlineAlertShown = true;
+  sessionStorage.setItem(sessionKey, '1');
+  urgent.forEach((c, i) => {
+    setTimeout(() => {
+      const tag = c.diff === 0 ? 'D-Day 오늘 마감!' : `D-${c.diff} 마감 임박!`;
+      const type = c.diff <= 1 ? 'critical' : 'warn';
+      showToast(`${c.name} — ${tag}`, `${c.job || '직무 미입력'} · 마감일 ${c.deadline}`, type,
+        { icon: c.diff === 0 ? '🚨' : '⏰', duration: 5000, actionLabel: '채용달력 보기',
+          onAction: () => switchTab('calendar', document.querySelectorAll('.tab-btn')[2]) });
+    }, i * 1500);
+  });
+}
+
+// ─── CHECKLIST SYSTEM ────────────────────────────────
+const CHECKLIST_ITEMS = ['지원한 직무의 핵심 역량 3가지 정리','해당 기업 최근 뉴스/이슈 검색','예상 질문 5개 + 답변 키워드 준비','1분 자기소개 연습','면접 복장/장소/시간 확인'];
+let _checklistCompanyId = null;
+function getChecklistKey(cid){ return 'stepup_checklist_' + (currentUser?.key||'') + '_' + cid; }
+function loadChecklist(cid){ return JSON.parse(localStorage.getItem(getChecklistKey(cid)) || '[]'); }
+function saveChecklist(cid, checks){ localStorage.setItem(getChecklistKey(cid), JSON.stringify(checks)); }
+function showChecklist(cid){
+  const c = companies.find(x => x.id === cid); if(!c) return;
+  _checklistCompanyId = cid;
+  document.getElementById('checklist-title').textContent = `📋 면접 준비 체크리스트 — ${c.name}`;
+  const checks = loadChecklist(cid);
+  document.getElementById('checklist-items').innerHTML = CHECKLIST_ITEMS.map((item, i) => {
+    const checked = checks[i] || false;
+    return `<div class="checklist-item${checked ? ' checked' : ''}"><input type="checkbox" id="ck-${i}" ${checked ? 'checked' : ''} onchange="toggleChecklistItem(${i}, this.checked)"><label for="ck-${i}">${item}</label></div>`;
+  }).join('');
+  updateChecklistProgress(cid);
+  document.getElementById('checklist-overlay').classList.add('open');
+}
+function toggleChecklistItem(idx, val){
+  if(_checklistCompanyId === null) return;
+  const checks = loadChecklist(_checklistCompanyId);
+  while(checks.length < CHECKLIST_ITEMS.length) checks.push(false);
+  checks[idx] = val; saveChecklist(_checklistCompanyId, checks);
+  const item = document.querySelectorAll('#checklist-items .checklist-item')[idx];
+  if(item) item.classList.toggle('checked', val);
+  updateChecklistProgress(_checklistCompanyId);
+}
+function updateChecklistProgress(cid){
+  const checks = loadChecklist(cid); const done = checks.filter(Boolean).length; const total = CHECKLIST_ITEMS.length;
+  const fill = document.getElementById('checklist-progress-fill');
+  const text = document.getElementById('checklist-progress-text');
+  if(fill) fill.style.width = Math.round((done/total)*100) + '%';
+  if(text) text.textContent = `${done}/${total}`;
+}
+function closeChecklist(){ document.getElementById('checklist-overlay').classList.remove('open'); _checklistCompanyId = null; }
+
+// ─── REVIEW SYSTEM ───────────────────────────────────
+let _reviewCompanyId = null, _reviewStage = null;
+function getReviewKey(cid, stage){ return 'stepup_review_' + (currentUser?.key||'') + '_' + cid + '_' + stage; }
+function loadReview(cid, stage){ return JSON.parse(localStorage.getItem(getReviewKey(cid, stage)) || '{}'); }
+function showReview(cid, stageIdx){
+  const c = companies.find(x => x.id === cid); if(!c) return;
+  _reviewCompanyId = cid; _reviewStage = stageIdx;
+  document.getElementById('review-stage-badge').textContent = {2:'1차면접', 3:'2차면접'}[stageIdx] || '';
+  document.getElementById('review-company-label').textContent = `${c.name} — ${c.job || '직무 미입력'}`;
+  const saved = loadReview(cid, stageIdx);
+  document.getElementById('review-good').value = saved.good || '';
+  document.getElementById('review-bad').value = saved.bad || '';
+  document.getElementById('review-unexpected').value = saved.unexpected || '';
+  document.getElementById('review-improve').value = saved.improve || '';
+  document.getElementById('review-overlay').classList.add('open');
+}
+function saveReview(){
+  if(_reviewCompanyId === null) return;
+  const data = { good: document.getElementById('review-good').value.trim(), bad: document.getElementById('review-bad').value.trim(),
+    unexpected: document.getElementById('review-unexpected').value.trim(), improve: document.getElementById('review-improve').value.trim(), savedAt: new Date().toISOString() };
+  localStorage.setItem(getReviewKey(_reviewCompanyId, _reviewStage), JSON.stringify(data));
+  showToast('회고 저장 완료', '면접 회고가 저장되었습니다.', 'success', {duration: 3000});
+  closeReview();
+}
+function closeReview(){ document.getElementById('review-overlay').classList.remove('open'); _reviewCompanyId = null; _reviewStage = null; }
+
+// ─── STEP CHANGE HOOK ────────────────────────────────
+function onStepChange(company, stepIdx, isActive){
+  if(!isActive) return;
+  switch(stepIdx){
+    case 1: setTimeout(() => showChecklist(company.id), 400); break;
+    case 2:
+      showToast(`${company.name} — 1차면접 진행`, '면접 준비 체크리스트를 확인하세요!', 'info',
+        { icon:'🎤', duration: 4000, actionLabel: '체크리스트 열기', onAction: () => showChecklist(company.id) });
+      break;
+    case 3:
+      showToast(`${company.name} — 2차면접 진행`, '1차면접 회고를 남기고, 2차면접을 준비하세요!', 'info',
+        { icon:'📝', duration: 5000, actionLabel: '1차면접 회고 작성', onAction: () => showReview(company.id, 2) });
+      break;
+    case 4:
+      showToast(`🏆 ${company.name} 최종합격!`, '축하합니다! 취업 준비의 결실을 맺었습니다.', 'success', { icon:'🎊', duration: 6000 });
+      break;
+    case 5:
+      showToast(`${company.name} — 아쉽지만 다음 기회로`, '불합격 원인을 분석하고 다음 지원에 반영해보세요.', 'warn',
+        { icon:'💪', duration: 6000, actionLabel: '자소서 분석 탭으로 이동',
+          onAction: () => { switchTab('analysis', document.querySelectorAll('.tab-btn')[4]); setTimeout(() => { const btn = document.querySelector('.ana-tab:nth-child(3)'); if(btn) btn.click(); }, 300); } });
+      if(company.steps[2] || company.steps[3]){
+        const last = company.steps[3] ? 3 : 2;
+        setTimeout(() => { showToast('면접 회고를 남겨보세요', '회고를 통해 다음 면접에서 더 좋은 결과를 만들 수 있습니다.', 'info',
+          { icon:'📝', duration: 5000, actionLabel: '면접 회고 작성', onAction: () => showReview(company.id, last) }); }, 1800);
+      }
+      break;
+  }
+}
+
+// ─── NEWS AUTO-LOAD + BRIEFING ───────────────────────
+function autoLoadNews(){
+  const briefing = document.getElementById('news-briefing');
+  if(!briefing) return;
+  briefing.style.display = 'block';
+  const cacheKey = 'stepup_news_last_load';
+  const lastLoad = parseInt(localStorage.getItem(cacheKey) || '0');
+  const oneHour = 60 * 60 * 1000;
+  if(newsLoaded && allNews.length > 0 && (Date.now() - lastLoad < oneHour)){ renderNewsBriefing(); return; }
+  if(!newsLoaded && Date.now() - lastLoad < oneHour){
+    const cached = localStorage.getItem('stepup_news_cache');
+    if(cached){ try{ allNews = JSON.parse(cached); newsLoaded = true; renderNewsBriefing(); return; }catch(e){} }
+  }
+  (async function(){
+    try{ await fetchNews(true); localStorage.setItem(cacheKey, String(Date.now())); localStorage.setItem('stepup_news_cache', JSON.stringify(allNews)); renderNewsBriefing(); }
+    catch(e){ const list = document.getElementById('news-briefing-list'); if(list) list.innerHTML = '<div class="news-briefing-loading">트렌드를 불러오지 못했습니다.</div>'; }
+  })();
+}
+function renderNewsBriefing(){
+  const list = document.getElementById('news-briefing-list');
+  const briefing = document.getElementById('news-briefing');
+  if(!list || !allNews || !allNews.length){ if(briefing) briefing.style.display = 'none'; return; }
+  briefing.style.display = 'block';
+  list.innerHTML = allNews.slice(0, 3).map(n => `<div><div class="news-briefing-item"><span>${esc(n.title)}</span></div>${n.point ? `<div class="news-briefing-point">💡 ${esc(n.point)}</div>` : ''}</div>`).join('');
+}
+
+// ─── AI HELPER (PIPELINE → ANALYSIS) ────────────────
+function openAIHelper(companyId){
+  const c = companies.find(x => x.id === companyId); if(!c) return;
+  switchTab('analysis', document.querySelectorAll('.tab-btn')[4]);
+  setTimeout(() => {
+    const sel = document.getElementById('ana-company');
+    if(sel){ sel.value = c.name; sel.dispatchEvent(new Event('change')); }
+    const jdTitle = document.getElementById('jd-title');
+    if(jdTitle && c.job) jdTitle.value = c.job;
+    const motiveSel = document.getElementById('ana-motive-company');
+    if(motiveSel) motiveSel.value = c.name;
+    updateAnalysisContext();
+    showToast(`${c.name} 맞춤 분석 준비 완료`, '기업 정보가 자동으로 채워졌습니다. 원하는 분석을 시작하세요.', 'info', { icon:'🤖', duration: 4000 });
+  }, 200);
+}
+
+// ─── ANALYSIS CONTEXT CARD ───────────────────────────
+function updateAnalysisContext(){
+  const card = document.getElementById('ana-context-card'); if(!card) return;
+  const sel = document.getElementById('ana-company');
+  const name = sel ? sel.value : '';
+  const c = companies.find(x => x.name === name);
+  if(!c){ card.classList.remove('visible'); return; }
+  card.classList.add('visible');
+  const stageLabels = ['서류제출','서류합격','1차면접','2차면접','최종합격','탈락'];
+  let currentStage = '미지원';
+  for(let i = 5; i >= 0; i--){ if(c.steps[i]){ currentStage = stageLabels[i]; break; } }
+  const typeBadge = c.type === 'target' ? '🎯' : (c.type === 'dream' ? '⭐' : '🛡');
+  document.getElementById('ana-ctx-company').innerHTML = `${typeBadge} <span>${esc(c.name)}</span>` +
+    (c.job ? `<span style="font-size:13px;font-weight:400;color:var(--text2)">· ${esc(c.job)}</span>` : '') +
+    (c.industry ? `<span style="font-size:12px;font-weight:400;color:var(--text3)">· ${esc(c.industry)}</span>` : '');
+  let metaHtml = `<span>📊 ${currentStage}</span>`;
+  if(c.deadline){ const diff = deadlineDiffDays(c.deadline); if(diff !== null && diff >= 0) metaHtml += `<span>⏰ D-${diff}</span>`; else if(diff !== null) metaHtml += `<span style="color:var(--text3)">마감됨</span>`; }
+  document.getElementById('ana-ctx-meta').innerHTML = metaHtml;
+}
+function syncMotiveCompany(){
+  const sel = document.getElementById('ana-company');
+  const motiveSel = document.getElementById('ana-motive-company');
+  if(sel && motiveSel && sel.value) motiveSel.value = sel.value;
+}
+
+// ─── PATCHES ─────────────────────────────────────────
+(function(){ const sel = document.getElementById('ana-company'); if(sel) sel.addEventListener('change', function(){ updateAnalysisContext(); syncMotiveCompany(); }); })();
+(function(){
+  const origRender = window.render || (typeof render === 'function' ? render : null);
+  if(!origRender) return;
+  let _firstRenderDone = false;
+  window.render = function(){
+    origRender();
+    if(!_firstRenderDone && companies && companies.length > 0){
+      _firstRenderDone = true;
+      setTimeout(checkDeadlineAlerts, 800);
+      setTimeout(autoLoadNews, 1200);
+    }
+  };
+})();
+</script>
+
+<!-- ══ TOAST CONTAINER ══ -->
+<div id="toast-container"></div>
+
+<!-- ══ CHECKLIST MODAL ══ -->
+<div class="modal-overlay" id="checklist-overlay">
+  <div class="modal checklist-modal" style="width:480px">
+    <h2 id="checklist-title">면접 준비 체크리스트</h2>
+    <div class="checklist-progress">
+      <div class="checklist-progress-bar"><div class="checklist-progress-fill" id="checklist-progress-fill" style="width:0%"></div></div>
+      <div class="checklist-progress-text" id="checklist-progress-text">0/5</div>
+    </div>
+    <div id="checklist-items"></div>
+    <div class="modal-actions">
+      <button class="btn btn-muted" onclick="closeChecklist()">나중에 보기</button>
+      <button class="btn" onclick="closeChecklist()">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ REVIEW MODAL ══ -->
+<div class="modal-overlay" id="review-overlay">
+  <div class="modal review-modal" style="width:520px">
+    <h2>면접 회고 <span class="review-stage-badge" id="review-stage-badge"></span></h2>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:18px" id="review-company-label"></p>
+    <div class="review-field"><label>잘한 점</label><textarea id="review-good" placeholder="면접에서 잘 대답했거나 자신 있었던 부분을 적어보세요."></textarea></div>
+    <div class="review-field"><label>아쉬운 점</label><textarea id="review-bad" placeholder="부족했거나 더 준비했으면 좋았을 부분을 적어보세요."></textarea></div>
+    <div class="review-field"><label>예상 못한 질문</label><textarea id="review-unexpected" placeholder="예상하지 못했던 질문이 있었나요?"></textarea></div>
+    <div class="review-field"><label>다음 면접 개선점</label><textarea id="review-improve" placeholder="다음 면접에서는 어떻게 준비할 건가요?"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-muted" onclick="closeReview()">나중에 보기</button>
+      <button class="btn" onclick="saveReview()">저장하기</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
